@@ -1,0 +1,37 @@
+\documentclass{report}
+\input{preamble}
+\begin{document}
+
+% Front page
+\subimport{}{frontpage.tex}
+
+
+% \maketitle
+% \begin{center}
+% 	\vspace{1cm}
+% 	\includegraphics[width=]{dtulogo}\\
+% 	\LARGE
+% 	Danmarks Tekniske Universitet - DTU\\
+% \end{center}
+\newpage
+
+% Abstract
+\subimport{}{abstract.tex}
+\newpage
+
+% TOC
+\tableofcontents
+\newpage
+
+% Sections
+\subimport{1-introduction/}{introduction.tex}
+\subimport{2-tracing-and-logging}{tracing-and-logging.tex}
+\subimport{3-vulnerability-analysis/}{vulnerability-analysis.tex}
+\subimport{4-detection/}{detection.tex}
+\subimport{5-scaling-and-extensibility/}{scaling-and-extensibility.tex}
+\subimport{6-conclusion/}{conclusion.tex}
+
+% Backmatter (Bibliography, figure list, table list)
+\subimport{}{backmatter.tex}
+
+\end{document}

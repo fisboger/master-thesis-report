@@ -1,0 +1,26 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+\begin{figure}[H]
+	\centering
+	\begin{sequencediagram}
+        \newthread{client}{Client}
+        % \newinst[5]{server}{Server}
+        \newthread[gray!30][6]{server}{Server}
+        % \newthread[5]{server}{Server}
+
+        \mess[1]{client}{1. SMB Negotiate request}{server}
+        \mess[1]{server}{2. SMB Negotiate response}{client}
+
+        \mess[1]{client}{3. NTLM Negotiate}{server}
+        \mess[1]{server}{4. NTLM Challenge}{client}
+
+        \mess[1]{client}{5. NTLM Authenticate}{server}
+        \mess[1]{server}{6. Access denied}{client}
+    \end{sequencediagram}
+    \caption{\gls{smb} NTLM authentication\cite{url:smb-ntlm-authentication}}
+    \label{fig:smb-ntlm-authentication}
+\end{figure}
+\end{document}

@@ -1,0 +1,14 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+% sample content
+\chapter{Detection}
+\label{cha:detection}
+\subimport{1-detection-etw/}{detection-windows-error-reporting.tex}
+\subimport{2-hooking-dtrace/}{hooking-dtrace.tex}
+\subimport{3-implementation/}{implementation.tex}
+
+\end{document}
