@@ -2,8 +2,11 @@
 % Abbreviations
 \printglossary[type=\acronymtype,title=Abbreviations]
 \newpage
-\listoffigures
-\renewcommand\listoflistingscaption{List of code snippets}
-\listoflistings
 \printbibliography[heading=bibintoc]
+\newpage
+\listoffigures
+\newpage
+\renewcommand\listoflistingscaption{List of code snippets}
+\addcontentsline{toc}{chapter}{List of code snippets}
+\listoflistings
 \subimport{appendices/}{appendices.tex}

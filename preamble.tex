@@ -68,11 +68,13 @@
 
 \loadglsentries{\relativepath./abbreviations}
 
+\newcommand*{\fullref}[1]{\hyperref[{#1}]{\autoref*{#1} (\nameref*{#1})}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Source code highlighting / listing
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[cache=false]{minted}
-\usemintedstyle{vs}
+\usemintedstyle{emacs}
 \setmintedinline{breaklines, breakanywhere}
 
 
