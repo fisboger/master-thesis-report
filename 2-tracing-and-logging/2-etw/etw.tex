@@ -7,12 +7,15 @@
 % sample content
 \section{Event tracing for Windows}
 \label{cha:etw}
-\todo{Add proper description of what ETW is.}
-\todo{Mention that we do not look at this from a developers perspective, but from analyzing already made applications/drivers}
+\gls{etw} is a logging mechanism that is built into the kernel of Windows. It is used by kernel-mode drivers and applications to provide realtime events and tracing features. While \gls{etw} is built into most drivers and applications made by Windows, it is also available for developers to use in their own applications. As most privileged applications built into Windows utilize \gls{etw}, it is a very good source for telemetry data related to discovering exploit attempts.
+\\
+\\
 In the architecture of \gls{etw} events are at the centerpiece where they are created, managed and consumed by different event components\cite{url:etw:about}. These differentiate between event \emph{providers}, event \emph{consumers}, and event \emph{controllers}. All of these event components handle the workflow of \gls{etw}, either by reading or writing, or by controlling the events in some way.
 
 \subsection{Event components}
 \todo{figure out if the components should just be subsections}
+As it can be seen on \fullref{fig:etw-model}, the central component of \gls{etw} is the \gls{etw} session. All \gls{etw} components communicate through the \gls{etw} session.\todo{Write more here}
+\subimport{figures/}{etw-model.tex}
 \subsubsection{Controllers}
 \subsubsection{Providers}
 Providers are the system- and userland applications that provide events and data. They do so by registering themselves as a provider, allowing a controller to enable or disable events. By having the controller control whether events are enabled or not, allows an application to have tracing without generating alerts all the time. This is especially interesting for debugging purposes, which is usually not needed during regular usage.
@@ -35,6 +38,7 @@ Figure \todo{add ref to figure} shows how the different components of \gls{etw} 
 
 
 \subimport{}{finding-providers.tex}
+\todo{Mention TI provider and how it is used in many EDRs to detect malicious activity}
 \subimport{}{consuming-events.tex}
 
 % \subimport{}{subsubsection.tex}

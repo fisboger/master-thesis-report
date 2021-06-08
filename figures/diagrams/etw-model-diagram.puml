@@ -1,5 +1,5 @@
 @startuml
-skinparam linetype ortho
+' skinparam linetype ortho
 ' node node1
 ' node node2
 ' node node3
@@ -28,12 +28,12 @@ EventTracingSessions -u-> Controllers
 
 
 
-EventTracingSessions <-d-- Providers
-EventTracingSessions -d--> Consumers
+EventTracingSessions <-d-- Providers : Events
+EventTracingSessions -d--> Consumers : Real-time delivery
 
 database "Log files" as LogFiles
 
-EventTracingSessions -r-> LogFiles
-LogFiles -d-> Consumers
+EventTracingSessions -r-> LogFiles : Events
+LogFiles -d-> Consumers : Logged Events
 ' Providers -u--> EventTracingSessions : Events
 @enduml

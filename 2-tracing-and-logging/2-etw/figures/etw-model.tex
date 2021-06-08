@@ -5,21 +5,47 @@
 \begin{document}
 \begin{figure}[H]
 	\centering
-	\begin{sequencediagram}
-        \newthread{client}{Client}
-        % \newinst[5]{server}{Server}
-        \newthread[gray!30][6]{server}{Server}
-        % \newthread[5]{server}{Server}
+	\begin{tikzpicture}[
+        ->, thick,]
+    \coordinate (O) at (0,0);
 
-        \mess[1]{client}{1. SMB Negotiate request}{server}
-        \mess[1]{server}{2. SMB Negotiate response}{client}
+    \node [block] (session) [minimum height = 5.1cm, minimum width = 3cm] {ETW Session};
+    \node [block] (controller) [above = 1cm of session] {Controllers};
+    \node [block] (realtime) [right = 1cm of session, yshift=-1cm] {Realtime consumer};
+    \node [block] (eventlog) [right = 1cm of session, yshift=1cm] {Event log};
+    \node [block] (consumers) [right = 4.9cm of session, rotate = 270, minimum width = 5.1cm, xshift=-2.55cm] {Consumers};
+    \node [block] (provider1) [left = 1cm of session, yshift=-2cm] {Event Provider};
+    \node [block] (provider2) [left = 1cm of session, yshift=0cm] {Event Provider};
+    \node [block] (provider3) [left = 1cm of session, yshift=2cm] {Event Provider};
+    \node [block] (buffers) [yshift=-1cm] {Buffers};
 
-        \mess[1]{client}{3. NTLM Negotiate}{server}
-        \mess[1]{server}{4. NTLM Challenge}{client}
 
-        \mess[1]{client}{5. NTLM Authenticate}{server}
-        \mess[1]{server}{6. Access denied}{client}
-    \end{sequencediagram}
+    \draw[-angle 90] (provider1.east) -- ([yshift=-2cm]session.west);
+    \draw[-angle 90] (provider2.east) -- (session.west);
+    \draw[-angle 90] (provider3.east) -- ([yshift=2cm]session.west);
+
+    \draw[-angle 90] ([xshift=0.5cm]controller.south) -- ([xshift=0.5cm]session.north);
+    \draw[-angle 90] ([xshift=-0.5cm]session.north) -- ([xshift=-0.5cm]controller.south);
+
+    \draw[-angle 90] ([yshift=1cm]session.east) -- (eventlog.west);
+    \draw[-angle 90] ([yshift=-1cm]session.east) -- (realtime.west);
+
+    \draw[-angle 90] (realtime.east) -- ([yshift=-0.985cm]consumers.south);
+    \draw[-angle 90] (eventlog.east) -- ([yshift=1.02cm]consumers.south);
+
+    % \node [block] (dnsserver) {DNS Server};
+    % \node [block] (client) [below = 4cm of dnsserver] {Client};
+    % \node (multicast) [below right = 0.5cm and 5cm of dnsserver] {Multicast};
+    % \node [block] (attacker) [right = 7cm of client] {Attacker};
+
+    % \draw[-angle 90] ([xshift=-0.4cm]client.north) -- node[midway,sloped,above] {1. Who is \emph{Server1?}} ([xshift=-0.4cm]dnsserver.south) ;
+    % \draw[-angle 90] ([xshift=0.4cm]dnsserver.south) -- node[midway,sloped,above] {2. Don't know} ([xshift=0.4cm]client.north) ;
+
+    % \draw[-angle 90] (client.north east) -- node[midway,sloped,above] {3. Name Query Request (\emph{Server1})} (multicast) ;
+    
+    % \draw[-angle 90] ([yshift=0.4cm] attacker.west) -- node[midway, sloped, above] {4. Name Query Response (\emph{Server1})} ([yshift=0.4cm] client.east);
+    % \draw[-angle 90] ([yshift=-0.4cm] client.east) -- node[midway, sloped, below] {5. Communication started} ([yshift=-0.4cm] attacker.west);
+    \end{tikzpicture}
     \caption{\gls{etw} model diagram\cite{url:etw:about}}
     \label{fig:etw-model}
 \end{figure}
