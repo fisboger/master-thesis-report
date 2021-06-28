@@ -18,18 +18,43 @@ As it can be seen on \fullref{fig:etw-model}, the central component of \gls{etw}
 \subimport{figures/}{etw-model.tex}
 \subsubsection{Controllers}
 \subsubsection{Providers}
-Providers are the system- and userland applications that provide events and data. They do so by registering themselves as a provider, allowing a controller to enable or disable events. By having the controller control whether events are enabled or not, allows an application to have tracing without generating alerts all the time. This is especially interesting for debugging purposes, which is usually not needed during regular usage.
+Providers are the system- and userland applications that provide events and data. They do so by registering themselves as a provider, allowing a controller to enable or disable events. By having the controller control whether events are enabled or not, allows an application to have tracing without generating alerts all the time. This is especially interesting for debugging purposes, which is usually not needed during regular usage of the operating system.
 \\
 \\
-Microsoft define four different types of providers depending on the version of Windows and type of application you are interested in.
+Microsoft define four different types of providers depending on the version of Windows and type of application you are interested in. The reason for having four different types of providers is simply that \gls{etw} evolved over time, and as such different providers were added in different versions of Windows\cite{url:etw:provider-types}.
 
 \paragraph{\gls{mof} (classic) providers}
+These types of providers are, as the name hints, the original format for specifying \gls{etw} providers. \gls{mof} providers use \gls{mof} classes\cite{url:etw:provider-types:mof:classes} to define events. \gls{mof} classes describe the format of the event registered by the provider to allow the consumer to read the event correctly. As it can be seen on listing \ref{listing:provider:mof:class}, a \gls{mof} class resemble a struct as known from the C programming language.
+
+\begin{listing}[H]
+\begin{minted}[breaklines, linenos, breakanywhere]{c++}
+[EventType{26}, EventTypeName{"SendIPV6"}]
+class TcpIp_SendIPV6 : TcpIp
+{
+    uint32 PID;
+    uint32 size;
+    object daddr;
+    object saddr;
+    object dport;
+    object sport;
+    uint32 startime;
+    uint32 endtime;
+    uint32 seqnum;
+    uint32 connid;
+};
+\end{minted}
+\caption{\mintinline{c}{TcpIp_SendIPV6 : TcpIp} \gls{mof} class}
+\label{listing:provider:mof:class}
+\end{listing}
 
 \paragraph{\gls{wpp} providers}
+With \gls{wpp} providers, Windows moved away from using \gls{mof} classes to the \gls{tmf} format. With \gls{tmf} the trace format description was moved into the \gls{pdb} of the binary. For most binaries the \gls{pdb} can be downloaded from Microsoft symbol servers\cite{url:microsoft:public-symbol-server}, however not all Windows drivers and applications have public debug symbols, so getting access to the \gls{tmf} is often a hit or miss.
 
 \paragraph{Manifest-based providers}
+With manifest-based providers a new format to describe events was implemented. Instead of embedding the format description into the \gls{pdb}, manifest-based providers embed the manifest directly into the binary as pointed to by the registry keys under \mintinline{c}{HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Publishers}. However, the manifest format is not well documented, making it hard parse and recover the schema needed to understand the events\cite{url:etw:various-information}. Manifest-based provider are however the first \gls{etw} provider type with the ability to be enabled by more than one trace session simultaneously, which is not possible with \gls{mof} and \gls{wpp} providers.
 
 \paragraph{TraceLogging providers}
+These types of providers are the newest type of providers in the \gls{etw} logging mechanism. Unlike all the previous types of providers, the TraceLogging provider includes event format description into the recorded log data\cite{url:etw:provider-types} allowing a consumer to easily understand the event data without prior knowledge of the format. As with manifest-based providers, TraceLogging can also be enabled by up to eight trace sessions simultaneously.
 
 \subsubsection{Consumers}
 Consumers are applications that consume events from providers. This is done through event \emph{trace sessions}, where one session is created per provider. Consumers have the ability to both receive events in real time from \emph{trace sessions}, or later on by events stored in log files. Furthermore, events can be filtered by many attributes such as timestamps.
