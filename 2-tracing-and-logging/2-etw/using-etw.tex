@@ -1,0 +1,61 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+% sample content
+\subsection{Using \acrfull{etw}}
+\label{cha:etw:constructing-trace-session}
+As mentioned in \fullref{cha:introduction}, the goal of this project is to research the possibilities of using built in telemetry, such as \gls{etw}, to detect the exploitation of vulnerabilities. Therefore, it is important to discover how \gls{etw} can be used to gather telemetry from providers.
+\\
+\\
+One \gls{etw} provider that is widely used to detect malicious activity such as exploitation of vulnerabilities is the \mintinline{c}{Microsoft_windows-Threat-Intelligence}\cite{url:etw:etwti} provider. This is widely used by various \gls{av} engines such as Microsoft's own \gls{edr}/\gls{av} tool, Microsoft Defender for Endpoint. While this provider gives insight into Windows \gls{api} calls often used in an exploitation process, we will not be focusing on this. As mentioned in \fullref{cha:introduction} and discussed in \fullref{sec:CVE-2021-24086}, the project will revolve around detection of CVE-2020-24086, which is a vulnerability in the \mintinline{c}{tcpip.sys} driver of Windows. Due to this, we will in this section explore \gls{etw} providers relevant to this specific driver.
+
+\subsubsection{Finding providers}
+\todo{Read this section thorougly as it has been revised a lot ad-hoc}
+Getting a list of all available providers in Windows is fairly simply. A few methods exists, such as:
+
+\begin{enumerate}
+    \item Using \mintinline{bash}{logman query providers}
+    \item Using the PowerShell command \mintinline{bash}{Get-TraceEtwProvider}
+    \item Enumerate registry keys under \mintinline{c}{HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Publishers}
+\end{enumerate}
+
+The output from method \emph{(3)}, the registry, is as mentioned in \autoref{sec:etw:providers:manifest-based}, only for manifest-based providers. Therefore, not all providers will be shown here. \fullref{fig:etw:providers:registry} shows how the information available using Registry Editor. As it can be seen the registry contains information about the binary the provider is implemented in, which in our case is \mintinline{c}{tcpip.sys}. 
+
+\subimport{figures/}{etw-providers-registry.tex}
+
+To find all manifest-based providers we can use the PowerShell script on listing \ref{listing:etw:provider:powershell:tcpipsys}, where the output of the command is also shown.
+
+\begin{listing}[H]
+\begin{minted}[breaklines, linenos, breakanywhere]{PowerShell}
+Get-ChildItem -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Publishers"
+    | Get-ItemProperty
+    | Where-Object {$_.ResourceFileName -like '*tcpip.sys*'}
+    | Format-List "(default)", ResourceFileName, MessageFilename, PSChildName
+
+(default)        : Microsoft-Windows-TCPIP
+ResourceFileName : C:\WINDOWS\system32\drivers\tcpip.sys
+MessageFileName  : C:\WINDOWS\system32\drivers\tcpip.sys
+PSChildName      : {2f07e2ee-15db-40f1-90ef-9d7ba282188a}
+\end{minted}
+\caption{\mintinline{c}{logman query providers} output. See appendix \ref{appendix:etw-providers} for full output}
+\label{listing:etw:provider:powershell:tcpipsys}
+\end{listing}
+
+The same information queried using \mintinline{bash}{logman query providers} can be seen in listing \ref{listing:etw:provider:logman}. However, the \mintinline{bash}{logman query providers} command does not display the \emph{ResourceFileName} as it can be seen on \autoref{fig:etw:providers:registry}.
+
+\subimport{figures/}{etw-providers-logman.tex}
+
+The number of providers registered according to \mintinline{c}{logman query providers} is 1162 whereas 972 of these are manifest-based providers according to data from the registry. One example of a non-manifest-based provider that can only be found using logman is the provider \emph{TCPIP Service Trace} as seen on line 15 in listing \ref{listing:etw:provider:logman}.
+\\
+\\
+Using the second method, \mintinline{bash}{Get-TraceEtwProvider}, simply yields a \mintinline{bash}{Access Denied} error rendering it useless.
+\\
+\\
+To conclude this section, we were able to find two different providers related to the TCP/IP stack on Windows. The first provider, \emph{Microsoft-Windows-TCPIP} is definitely related to \mintinline{c}{tcpip.sys} according to the \emph{ResourceFileName} property. The second however is a bit more cumbersome as logman does not provide any more information than the name (\emph{TCPIP Service Trace}) and the GUID.
+
+\subsubsection{Starting a trace}
+
+\end{document}

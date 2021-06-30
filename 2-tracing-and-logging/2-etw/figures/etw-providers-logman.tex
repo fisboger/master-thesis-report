@@ -1,0 +1,28 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+\begin{listing}[H]
+\begin{minted}[breaklines, linenos, breakanywhere, fontsize=\footnotesize]{bash}
+Provider                                 GUID
+-------------------------------------------------------------------------------
+.NET Common Language Runtime             {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}
+ACPI Driver Trace Provider               {DAB01D4D-2D48-477D-B1C3-DAAD0CE6F06B}
+Active Directory Domain Services: SAM    {8E598056-8993-11D2-819E-0000F875A064}
+Active Directory: Kerberos Client        {BBA3ADD2-C229-4CDB-AE2B-57EB6966B0C4}
+Active Directory: NetLogon               {F33959B4-DBEC-11D2-895B-00C04F79AB69}
+ADODB.1                                  {04C8A86F-3369-12F8-4769-24E484A9E725}
+ADOMD.1                                  {7EA56435-3F2F-3F63-A829-F0B35B5CAD41}
+Application Popup                        {47BFA2B7-BD54-4FAC-B70B-29021084CA8F}
+Application-Addon-Event-Provider         {A83FA99F-C356-4DED-9FD6-5A5EB8546D68}
+...
+Microsoft-Windows-TCPIP                  {2F07E2EE-15DB-40F1-90EF-9D7BA282188A}
+...
+TCPIP Service Trace                      {EB004A05-9B1A-11D4-9123-0050047759BC}
+...
+\end{minted}
+\caption{\mintinline{c}{logman query providers} output. See appendix \ref{appendix:etw-providers} for full output}
+\label{listing:etw:provider:logman}
+\end{listing}
+\end{document}

@@ -1,4 +1,3 @@
-
 Provider                                 GUID
 -------------------------------------------------------------------------------
 .NET Common Language Runtime             {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}
