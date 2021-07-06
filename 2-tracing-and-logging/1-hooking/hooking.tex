@@ -95,22 +95,16 @@ int HookSourceFunction()
 \label{listing:c:hooking-prototype}
 \end{listing}
 
+In this section we described one method of hooking function in Windows. However, this specific implementation has certain limitations and flaws. One important flaw is the fact that the hook is removed upon trigger and never reinstated making it a one time hook. This could be improved upon, but it is outside the scope of this section to do so. Hooking used in production system should use more well tested methods such as the trampoline method\cite{url:hooking:halladay} which is how Microsoft Detours work\cite{url:hooking:detours}.
 
-    % 
-% To pass parameters to a function
-% What is function hooking
-% Talk about usermode vs kernel
-% What happens
-% How to do this
+\subsection{Kernel mode function hooking}
+\label{sec:hooking:kernel-mode}
+Up until this point we have only described how user mode function hooking works. To hook a driver such as \mintinline{c}{tcpip.sys} however, we need to do kernel mode function hooking. This poses an extra challenge as hooking can no longer be done from an user mode process. To hook kernel mode functions the application doing the hooking must also run from the kernel.
 
-\subsection{User mode function hooking}
-% Modifies local "instances"
-
-\subsection{Kernel mode hooking}
-% Modifies kernel assembly
-% Kernel protection
-% Requires signed driver
-
-% \subimport{}{subsubsection.tex}
+\paragraph{Windows security features.} Windows has in recent years implemented several security features making it harder to exploit memory corruption vulnerabilities. Among these security features is the Driver Signing Policy which will prohibit any driver from being loaded if it is not signed with a valid EV code signing certificate\cite{url:hooking-driver-signing-policy}.
+If however, you are able to properly sign a driver, security features such as \gls{DEP}, \gls{HVCI} and \gls{CFG} make it increasingly harder to modify process memory and redirect execution.
+\\
+\\
+With these security features in mind, it becomes increasingly more difficult to hook functions in kernel mode. Even more so, readily available function hooking libraries such as Microsoft Detours\cite{url:hooking:detours} does not work in kernel mode, forcing one to create their own solution. Being in kernel mode also makes mistakes very costly, as a simple exception or error will not only crash the program but the whole computer resulting in a \gls{BSOD}.
 
 \end{document}

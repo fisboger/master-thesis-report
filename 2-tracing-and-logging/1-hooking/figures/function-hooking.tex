@@ -12,8 +12,8 @@
     \node [block] (source) {Source function};
     \node [block] (target) [right = 1cm of source] {Target function};
 
-    \draw[] (source.north) to[out=90,in=90] node[midway, above] {1. Intercept function} (target.north);
-    \draw[] (target.south) to[out=-90,in=-90] node[midway, below] {2. Return to original} (source.south);
+    \draw[] (source.north) to[out=90,in=90] node[midway, above] {1. Redirect to target function} (target.north);
+    \draw[] (target.south) to[out=-90,in=-90] node[midway, below, align = left] {2. Remove hook\\3. Return to source function} (source.south);
 
     \end{tikzpicture}
     \caption{Function hooking}

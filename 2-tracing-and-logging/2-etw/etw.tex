@@ -25,7 +25,7 @@ Providers are the system- and userland applications that provide events and data
 \\
 Microsoft define four different types of providers depending on the version of Windows and type of application you are interested in. The reason for having four different types of providers is simply that \gls{ETW} evolved over time, and as such different providers were added in different versions of Windows\cite{url:etw:provider-types}.
 
-\paragraph{\gls{mof} (classic) providers}
+\subsubsection{\gls{mof} (classic) providers.}
 These types of providers are, as the name hints, the original format for specifying \gls{ETW} providers. \gls{mof} providers use \gls{mof} classes\cite{url:etw:provider-types:mof:classes} to define events. \gls{mof} classes describe the format of the event registered by the provider to allow the consumer to read the event correctly. As it can be seen on listing \ref{listing:provider:mof:class}, a \gls{mof} class resemble a struct as known from the C programming language.
 
 \begin{listing}[H]
