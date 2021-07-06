@@ -1,0 +1,116 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+% sample content
+\section{Function hooking}
+\label{sec:hooking}
+Function hooking, also known as API hooking, method hooking or simply binary hooking, is the process of intercepting function calls and redirecting the execution somewhere else. In most cases the execution is redirected to a function defined by the process intercepting the target function call, but can also be used to redirect execution somewhere else. To understand function hooking, it is important to understand how functions work on the assembly level\footnote{Note that this project only deals with 64-bit Intel x86 assembly called x64\_84}.
+
+\paragraph{x64\_86 Call instruction.} In x64\_84 assembly, the \mintinline{asm}{call} instruction exists for calling functions\cite{url:hooking:asm:call}. Parameters to the function is passed in registers and on the stack according to the calling convention\cite{url:hooking:asm:calling-convention:x64}. In x64\_86 assembly the parameters are passed according to the rules shown in table \ref{tab:asm:calling-convention}
+{
+    \setlength\LTleft{-0.25\textwidth}%
+\begin{tabularx}{1.5\textwidth}{llllll}
+\textbf{Parameter type}    & \textbf{Fifth and higher} & \textbf{Fourth} & \textbf{Third} & \textbf{Second} & \textbf{Leftmost} \\ \hline
+floating-point                                   & stack                                         & XMM3                                & XMM2                               & XMM1                                & XMM0                                  \\
+integer                                          & stack                                         & R9                                  & R8                                 & RDX                                 & RCX                                   \\
+Aggregates (8, 16, 32, or 64 bits) and \_\_m64 & stack                                         & R9                                  & R8                                 & RDX                                 & RCX                                   \\
+Other aggregates, as pointers                  & stack                                         & R9                                  & R8                                 & RDX                                 & RCX                                   \\
+\textbf{\_\_m128, as a pointer}                  & stack                                         & R9                                  & R8                                 & RDX                                 & RCX                                  \\
+\caption{x64\_86 calling convention in Windows\cite{url:hooking:asm:calling-convention:x64}}
+\label{tab:asm:calling-convention}
+\end{tabularx}
+}
+
+For everything else than floating-point types, the parameters are passed in the order: \mintinline{asm}{RCX}, \mintinline{asm}{RDX}, \mintinline{asm}{R8}, \mintinline{asm}{R9}, and hereafter the stack as shown on listing \ref{listing:asm:calling-convention}
+
+\begin{listing}[H]
+\begin{minted}[breaklines, linenos, breakanywhere]{c++}
+func1(int a, int b, int c, int d, int e, int f);
+// a in RCX, b in RDX, c in R8, d in R9, f then e pushed on stack
+\end{minted}
+\caption{x64\_86 calling convention demonstrated\cite{url:hooking:asm:calling-convention:x64}}
+\label{listing:asm:calling-convention}
+\end{listing}
+
+\paragraph{Function interception and hooking.} To hook a function is to simply redirect the execution somewhere else. Figure \ref{fig:function-hooking} shows the logic of redirecting the execution to another function, and hereafter returning to the original function.
+
+\subimport{figures/}{function-hooking.tex}
+
+To redirect the execution of the source function to a target function, the instruction \mintinline{asm}{JMP}\cite{url:hooking:asm:ret} can be used. This instruction will return to the address located on the stack. The assembly code on listing \ref{listing:asm:intercept} shows how this is done. The assembly should be written to memory at the beginning of the source function.
+
+\begin{listing}[H]
+\begin{minted}[breaklines, linenos, breakanywhere]{asm}
+// Push our target function address to the stack
+PUSH targetFunctionAddress
+// Return to the location recently pushed on stack (targetFunctionAddress)
+RET
+\end{minted}
+\caption{x64\_86 assembly code for redirecting execution}
+\label{listing:asm:intercept}
+\end{listing}
+
+\paragraph{Returning to source function.} When hooking a function, you often want to return back to the original function. Two considerations are needed when doing so. First off, the target function must restore the parameters originally passed to the source function in order to continue execution. Secondly, the hook it self must be temporarily removed by restoring the replaced bytes, such that calling the source function will not redirect to the target function again. Failing to do so will result in an infinite loop. Listing \ref{listing:c:hooking-prototype} shows a simplified prototype written in C++
+
+\begin{listing}[H]
+\begin{minted}[breaklines, linenos, breakanywhere]{c++}
+FARPROC sourceFunctionAddress = NULL;
+SIZE_T bytesWritten = 0;
+char sourceFunctionOriginalBytes[6] = {};
+
+int __stdcall TargetFunction(int parameter1, int parameter2) {
+	
+	WriteProcessMemory(GetCurrentProcess(), (LPVOID)sourceFunctionAddress, sourceFunctionOriginalBytes, sizeof(sourceFunctionOriginalBytes), &bytesWritten);
+	
+	// call the source function
+	return SourceFunction(parameter1, parameter2);
+}
+
+int HookSourceFunction()
+{
+	HINSTANCE library = LoadLibraryA("sourceLibrary");
+	SIZE_T bytesRead = 0;
+	
+	// get address of the source function in memory
+	sourceFunctionAddress = GetProcAddress(library, "sourceFunction");
+
+	// save the first 6 bytes of the source function - it is needed for unhooking
+	ReadProcessMemory(GetCurrentProcess(), sourceFunctionAddress, sourceFunctionOriginalBytes, 6, &bytesRead);
+	
+    // Patch the source function
+	void *targetFunctionAddress = &TargetFunction;
+	char patch[6] = { 0 };
+	memcpy_s(patch, 1, "\x68", 1); // ASM: PUSH
+	memcpy_s(patch + 1, 4, &targetFunctionAddress, 4);
+	memcpy_s(patch + 5, 1, "\xC3", 1); // ASM: RET
+
+	WriteProcessMemory(GetCurrentProcess(), (LPVOID)sourceFunctionAddress, patch, sizeof(patch), &bytesWritten);
+
+	return 0;
+}
+\end{minted}
+\caption{Simplified prototype to hook a function using C++}
+\label{listing:c:hooking-prototype}
+\end{listing}
+
+
+    % 
+% To pass parameters to a function
+% What is function hooking
+% Talk about usermode vs kernel
+% What happens
+% How to do this
+
+\subsection{User mode function hooking}
+% Modifies local "instances"
+
+\subsection{Kernel mode hooking}
+% Modifies kernel assembly
+% Kernel protection
+% Requires signed driver
+
+% \subimport{}{subsubsection.tex}
+
+\end{document}

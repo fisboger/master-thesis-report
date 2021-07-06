@@ -1,0 +1,22 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+        ->, thick,]
+    \coordinate (O) at (0,0);
+
+    \node [block] (source) {Source function};
+    \node [block] (target) [right = 1cm of source] {Target function};
+
+    \draw[] (source.north) to[out=90,in=90] node[midway, above] {1. Intercept function} (target.north);
+    \draw[] (target.south) to[out=-90,in=-90] node[midway, below] {2. Return to original} (source.south);
+
+    \end{tikzpicture}
+    \caption{Function hooking}
+    \label{fig:function-hooking}
+\end{figure}
+\end{document}
