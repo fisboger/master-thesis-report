@@ -99,7 +99,7 @@ In this section we described one method of hooking function in Windows. However,
 
 \subsection{Kernel mode function hooking}
 \label{sec:hooking:kernel-mode}
-Up until this point we have only described how user mode function hooking works. To hook a driver such as \mintinline{c}{tcpip.sys} however, we need to do kernel mode function hooking. This poses an extra challenge as hooking can no longer be done from an user mode process. To hook kernel mode functions the application doing the hooking must also run from the kernel.
+Up until this point we have only described how user mode function hooking works. To hook a driver such as \mintinline{c}{tcpip.sys} however, we need to do kernel mode function hooking. This poses an extra challenge as hooking can no longer be done from an user mode process. To hook kernel mode functions the application doing the hooking must also run in the kernel.
 
 \paragraph{Windows security features.} Windows has in recent years implemented several security features making it harder to exploit memory corruption vulnerabilities. Among these security features is the Driver Signing Policy which will prohibit any driver from being loaded if it is not signed with a valid EV code signing certificate\cite{url:hooking-driver-signing-policy}.
 If however, you are able to properly sign a driver, security features such as \gls{DEP}, \gls{HVCI} and \gls{CFG} make it increasingly harder to modify process memory and redirect execution.

@@ -1,0 +1,27 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{c}
+if ( packetSize > 0xFFFF )
+{
+    if ( (BYTE4(WPP_MAIN_CB.Queue.Wcb.DeviceRoutine) & 0x40) != 0 && dword_1C01FECA4 == 1 )
+        McTemplateK0qq_EtwWriteTransfer(
+        &MICROSOFT_TCPIP_PROVIDER_Context,
+        &TCPIP_IP_REASSEMBLY_FAILURE_PKT_LEN,
+        &MICROSOFT_TCPIP_PROVIDER,
+        *(unsigned int *)(v6 + 8),
+        23);
+
+    LOBYTE(LockArray_high) = a3;
+    IppDeleteFromReassemblySet(v7 + 20304, a2, LockArray_high);
+    goto failure;
+}
+\end{minted}
+\caption{\gls{ETW} event in patched version of \mintinline{c}{Ipv6pReassembleDatagram}}
+\label{listing:detection:etw:post-patch-event}
+\end{listing}
+\end{document}

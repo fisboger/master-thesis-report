@@ -7,7 +7,71 @@
 % sample content
 \section{\acrfull{ETW}}
 \label{sec:detection:etw}
+With \gls{ETW}, the provider has to provide events, meaning a call to one of the tracing APIs has to be there. When reverse engineering binaries it is possible to look for such events to discover if they are used. As we are mainly concerned about \gls{ETW} events sent by \mintinline{c}{tcpip.sys} examining said binary is a good starting point. \mintinline{c}{tcpip.sys} registers itself as a \gls{wpp} provider and therefore uses the kernel mode functions \mintinline{c}{EtwWrite} and \mintinline{c}{EtwWriteTransfer}\cite{url:etw:kernel-mode-functions}. To examine the usage of \mintinline{c}{EtwWriteTransfer}, we can look at figure \ref{fig:detection:etw:etwwritetransfer-refs} where it shows that only 34 references to \mintinline{c}{EtwWriteTransfer} exists.
 
-% \subimport{}{subsubsection.tex}
+\subimport{figures/}{etwwritetransfer-refs}
+
+However, as \mintinline{c}{tcpip.sys} uses \gls{wpp}, \gls{ETW} is implemented through the use of macros\cite{url:etw:wpp:kernel-drivers} the real number cannot be found by direct references to \mintinline{c}{EtwWriteTransfer}. Instead we can create a graph of all functions interacting with \mintinline{c}{EtwWriteTransfer} somehow, which tells us that almost all functions has an indirect connection to \mintinline{c}{EtwWriteTransfer}. This gives a good overview of the scale of \gls{ETW} usage within the \mintinline{c}{tcpip.sys} binary.
+
+\paragraph{Hunting for relevant events.} Looking at the stacktrace from listing \ref{listing:poc:windbg} from \fullref{cve-2021-24086:triggering}, we can see that we have a few function calls before the vulnerability is triggered in \mintinline{c  }{Ipv6pReassembleDatagram}. Analyzing all \gls{ETW} API calls we get the results present on table \ref{tab:detection:etw:api-usage}, where we can see that while the top-level functions have four or five calls to \gls{ETW} api functions, the lower level have none.
+
+{
+    % \setlength\LTleft{-0.1\textwidth}%
+\begin{tabularx}{\textwidth}{llX}
+\textbf{Function}        & \textbf{\# of \gls{ETW} API calls} & \textbf{\# due to\newline error checking} \\ \hline
+Ipv6pReassembleDatagram  & 4                            & 3                                 \\
+Ipv6pReceiveFragment     & 5                            & 5                                 \\
+Ipv6pReceiveFragmentList & 0                            & 0                                 \\
+IppReceiveHeaderBatch    & 0                            & 0                                 \\
+IppFlcReceivePacketsCore & 0                            & 0                                 \\
+IpFlcReceivePackets      & 0                            & 0                                 \\
+\caption{\gls{ETW} API calls for functions related to CVE-2021-24086}
+\label{tab:detection:etw:api-usage}
+\end{tabularx}
+}
+
+
+\paragraph{Event usability analysis.}
+While we now know that \gls{ETW} events are created in certain circumstances within the relevant functions of \mintinline{c}{tcpip.sys}, the question remains whether any of these events can be used for detecting attempts to exploit CVE-2021-24086. If we look closer at table \ref{tab:detection:etw:api-usage} we can see that most of the \gls{ETW} api calls are a result of error checking. An example of such a check can be seen on listing \ref{listing:detection:etw:error-checking-example}. As it clearly shows, a event is written if the allocation of a \mintinline{c}{NetBufferList} fails. The other error checking events are very similar in nature. This poses an issue in regards to detection, as exploits usually exploit \emph{unknown} states in binaries that can often be abused for malicious purposes. As the states exploited are unknown, default error checking do usually not detect such states, because if they did there would most likely be no vulnerability. This is true for the error check shown in listing \ref{listing:detection:etw:error-checking-example}, and it is also true for the eight other events written in \mintinline{c}{Ipv6pReassembleDatagram} and \mintinline{c}{Ipv6pReceiveFragment}.
+
+\subimport{figures/}{error-checking-example.tex}
+
+The last event which is not directly related to error checking, at least not on the surface, is unfortunately an error checking event in disguise. The event is shown on listing \ref{listing:detection:etw:last-event}. Knowing the specification of \mintinline{c}{EtwWriteTransfer}\cite{url:etw:etwwritetransfer-api}, we can quickly see that the second parameter, \mintinline{c}{PCEVENT_DESCRIPTOR EventDescriptor}, shows that this event is also most likely related to some kind of error\cite{url:etw:etwwritetransfer-api}. The value is \mintinline{c}{TCPIP_IP_REASSEMBLY_FAILURE_IPSEC}\cite{url:etw:etw-event-descriptor} strongly suggesting that it is only triggered upon a failure. Looking at the event known to be error checking on listing \ref{listing:detection:etw:error-checking-example} we can also see the similarity between the naming of the \mintinline{c}{EventDescriptor}.
+
+\subimport{figures/}{last-event.tex}
+
+Examining the surrounding code further, we can see that the event is sent if the \mintinline{c}{NetBuffer} used to store the packet is not large enough to fit the packet, thereby concluding that is actually is an error checking event.
+\\
+\\
+Having examined all the events present in any of the related functions from the stacktrace we can with confidence say that it is not possible to detect CVE-2021-24068 using close proximity \gls{ETW} events.
+
+\todo{Maybe add paragraph about why looking at other ETW events is the same as network analysis which is probably easier}
+
+\subsection{Usage of \gls{ETW} for known vulnerabilities} 
+In the previous section we highlighted the usage of \gls{ETW} events used to report when the execution enters into unintended states, and how this cannot be used for detecting unknown vulnerabilities. A change that we did not highlight during the analysis of CVE-2021-24086 in \fullref{sec:CVE-2021-24086}, was the fact that a new call to \mintinline{c}{EtwWriteTransfer} was added in the patched version of \mintinline{c}{tcpip.sys}. The call can be seen in listing \ref{listing:detection:etw:post-patch-event} and is written when the size of the packet is above 0xFFFF bytes.
+
+\subimport{figures/}{post-patch-event.tex}
+
+\paragraph{Detecting CVE-2021-24086 attempts post-patch.}
+To showcase the power of \gls{ETW} we can examine this specific event and create a simple \gls{ETW} session to consume it.
+\\
+To understand how to filter \gls{ETW} events it is important to understand the \mintinline{c}{EVENT_DESCRIPTOR} structure as seen on listing \ref{listing:detection:etw:event-descriptor}, notably the parameters \mintinline{c}{UCHAR Level} and \mintinline{c}{ULONGLONG Keyword}\footnote{\mintinline{c}{ULONGLONG} is equivalent to a 64-bit unsigned integer, \mintinline{c}{uint64}}
+
+\subimport{figures/}{event-descriptor.tex}
+
+Both the \mintinline{c}{Level} and \mintinline{c}{Keyword} parameters are used to filter events when using the PowerShell function \mintinline{bash}{Add-EtwTraceProvider}. Looking at the specific event written, we can see that the \mintinline{c}{Level} is equal to \emph{Warning}\cite{url:etw:etw-event-descriptor} and the \mintinline{c}{Keyword} is equal to \emph{0x8000000200000080}. Listing \ref{listing:detection:etw:detection-post-patch:commands} shows exactly how to start a trace for this specific event and Lisiting \ref{listing:detection:etw:detection-post-patch:result} shows the result when trying to exploit CVE-2021-24086 on a patched Windows 10 machine.
+
+\subimport{figures/}{etw-detection-post-patch.tex}
+\subimport{figures/}{etw-detection-post-patch-results.tex}
+
+As it can be seen, the message \emph{"Reassembly failure: packets do not add up correctly"} is displayed which is an event generated by \mintinline{c}{Ipv6pReassembleDatagram}, which allows us to detect exploitation attempts of CVE-2021-24086. However, the \gls{ETW} event are only written on patched machines, so it is uneffective for detection exploitation attempts on unpatched machines.
+\\
+\\
+\todo{Write about how we can only detect post-patch, but that this also proves that ETW can be used, if only the "right" events are written}
+
+% Only detect post patch
+% Because now we know this is an unintended state
+% Showcase that ETW can be used for detection of this type, but it requires more "generic" events.
+% Generic event could be more debug related, such as "Reassembling packet with x bytes"
 
 \end{document}

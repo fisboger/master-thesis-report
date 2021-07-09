@@ -1,0 +1,21 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{c}
+if ( (BYTE4(WPP_MAIN_CB.Queue.Wcb.DeviceRoutine) & 0x40) != 0 && dword_1C01FECA4 == 1 )
+      McTemplateK0qqq_EtwWriteTransfer(
+        (unsigned int)&MICROSOFT_TCPIP_PROVIDER_Context,
+        (unsigned int)&TCPIP_IP_REASSEMBLY_FAILURE_IPSEC,
+        (unsigned int)&MICROSOFT_TCPIP_PROVIDER,
+        *(_DWORD *)(v6 + 8),
+        23,
+        v20);
+\end{minted}
+\caption{Event presumably unrelated to error checking}
+\label{listing:detection:etw:last-event}
+\end{listing}
+\end{document}

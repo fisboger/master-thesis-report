@@ -1,0 +1,14 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{powershell}
+[2]0000.0000::07/08/2021-22:37:02.308 [Microsoft-Windows-TCPIP]Reassembly failure: packets do not add up correctly.  Interface = 6. Address family = IPV6 .
+\end{minted}
+\caption{Post-patch detection of CVE-2021-24086 exploitation attempt}
+\label{listing:detection:etw:detection-post-patch:result}
+\end{listing}
+\end{document}

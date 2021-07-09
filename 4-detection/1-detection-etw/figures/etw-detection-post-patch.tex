@@ -1,0 +1,16 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{powershell}
+New-EtwTraceSession -Name TCPIPTrace -LogFileMode 0x8100 -FlushTimer 1
+Add-EtwTraceProvider -SessionName TCPIPTrace -Guid '{2F07E2EE-15DB-40F1-90EF-9D7BA282188A}' -MatchAnyKeyword "0x8000000200000080" -Level 0x2
+.\tracefmt -rt TCPIPTrace -displayonly
+\end{minted}
+\caption{Starting an \gls{ETW} session to detect CVE-2021-24086 post-patch}
+\label{listing:detection:etw:detection-post-patch:commands}
+\end{listing}
+\end{document}

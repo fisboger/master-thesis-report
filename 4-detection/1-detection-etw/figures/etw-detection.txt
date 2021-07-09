@@ -1,0 +1,32 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{c}
+NetBufferList = (_NET_BUFFER_LIST *)NetioAllocateAndReferenceNetBufferAndNetBufferList(IppReassemblyNetBufferListsComplete, datagram, 0i64, 0i64, 0, 0);
+if ( !NetBufferList )
+{
+    LOBYTE(v12) = a3;
+    IppDeleteFromReassemblySet(v7 + 20304, datagram, v12);
+    goto failure;
+}
+
+...
+
+failure:
+    if ( dword_1C01FECA4 == 1 && (WPP_MAIN_CB.Queue.Wcb.NumberOfChannels & 0x8000000) != 0 )
+        McTemplateK0z_EtwWriteTransfer(
+        (__int64)&MICROSOFT_TCPIP_PROVIDER_Context,
+        (__int64)&TCPIP_MEMORY_FAILURES,
+        v14,
+        L"IPv6 reassembly structures (IPNG)");
+
+    goto memory_failure;
+\end{minted}
+\caption{Example of error checking \gls{ETW} api call}
+\label{listing:detection:etw:error-checking-example}
+\end{listing}
+\end{document}

@@ -1,0 +1,22 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{c}
+typedef struct _EVENT_DESCRIPTOR {
+  USHORT    Id;
+  UCHAR     Version;
+  UCHAR     Channel;
+  UCHAR     Level;
+  UCHAR     Opcode;
+  USHORT    Task;
+  ULONGLONG Keyword;
+} EVENT_DESCRIPTOR, *PEVENT_DESCRIPTOR;
+\end{minted}
+\caption{\mintinline{c}{EVENT_DESCRIPTOR} structure\cite{url:etw:etw-event-descriptor}}
+\label{listing:detection:etw:event-descriptor}
+\end{listing}
+\end{document}
