@@ -269,361 +269,93 @@ https://public.cnotools.studio/bring-your-own-vulnerable-kernel-driver-byovkd/ex
 
 
 
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-@online{url:zero-to-domain-admin,
-	Author = {Georgia Weidman},
-	urldate = {2018-11-15},
-	Title = {Scenario-based pen-testing: From zero to domain admin with no missing patches required},
-	Url = {https://www.computerworld.com/article/2843632/security0/scenario-based-pen-testing-from-zero-to-domain-admin-with-no-missing-patches-required.html}
+%%%%%%%%%%%%%%%%%%%% Related work %%%%%%%%%%%%%%%%%%%%
+@article{paper:related-work:dacoda,
+	Author = {Jedidiah R. Crandall and Zhendong Su and S. Felix Wu},
+	Year = 2005,
+	Title = {On deriving unknown vulnerabilities from zero-day polymorphic and metamorphic worm exploits},
+	Url = {https://people.cs.uchicago.edu/~ftchong/papers/ccs05.pdf}
 }
 
-%%%%%%%%%%%%%%%%%%%% MICROSOFT %%%%%%%%%%%%%%%%%%%%
-@online{url:microsoft:dump-memory-task-manager,
-	Author = {Microsoft},
-	urldate = {2018-01-07},
-	Title = {How to create a user-mode process dump file in Windows},
-	Url = {https://support.microsoft.com/en-us/help/931673/how-to-create-a-user-mode-process-dump-file-in-windows}
+@article{paper:related-work:taint-check,
+	Author = {James Newsome and Dawn Song},
+	Year = 2005,
+	Title = {Dynamic taint analysis for automatic detection, analysis, and signature generation of exploits on commodity software.},
+	Url = {https://www.cs.umd.edu/class/spring2017/cmsc818O/papers/taint-tracking.pdf}
 }
 
-@online{url:microsoft:sysinternals:procdump,
-	Author = {Microsoft},
-	urldate = {2018-01-07},
-	Title = {ProcDump v9.0},
-	Url = {https://docs.microsoft.com/en-us/sysinternals/downloads/procdump}
+
+@online{url:0-day-detection:checkpoint,
+	Author = {Checkpoint},
+	urldate = {2021-07-10},
+	Title = {How to Prevent Zero Day Attacks},
+	Url = {https://www.checkpoint.com/cyber-hub/threat-prevention/what-is-zero-day-attack/how-to-prevent-zero-day-attacks/}
 }
 
-%%%%%%%%%%%%%%%%%%%% SMB %%%%%%%%%%%%%%%%%%%%
-@online{url:smb-ntlm-authentication,
-	Author = {Microsoft},
-	urldate = {2018-11-15},
-	Title = {NTLM Over Server Message Block (SMB)},
-	Url = {https://msdn.microsoft.com/en-us/library/cc669093.aspx}
+@online{url:0-day-detection:capsule8,
+	Author = {Capsule8},
+	urldate = {2021-07-10},
+	Title = {How to detect and mitigate zero-day attacks},
+	Url = {https://info.capsule8.com/how-to-detect-and-prevent-zero-day-attacks}
 }
 
-@online{url:http-ntlm-authentication,
-	Author = {Ronald Tschalär},
-	urldate = {2019-01-03},
-	Title = {NTLM Authentication Scheme for HTTP},
-	Url = {https://www.innovation.ch/personal/ronald/ntlm.html}
+@online{url:0-day-detection:logsign,
+	Author = {Logsign},
+	urldate = {2021-07-10},
+	Title = {Identifying and tecting zero-day attacks},
+	Url = {https://www.logsign.com/siem-use-cases/identifying-and-detecting-zero-day-attacks/}
 }
 
-@online{url:account-lockout-policy,
-	Author = {Microsoft},
-	urldate = {2018-11-17},
-	Title = {Account lockout threshold},
-	Url = {https://docs.microsoft.com/en-us/windows/security/threat-protection/security-policy-settings/account-lockout-threshold}
+@article{10.1371/journal.pone.0228439,
+    doi = {10.1371/journal.pone.0228439},
+    author = {Fang, Yong AND Liu, Yongcheng AND Huang, Cheng AND Liu, Liang},
+    journal = {PLOS ONE},
+    publisher = {Public Library of Science},
+    title = {FastEmbed: Predicting vulnerability exploitation possibility based on ensemble machine learning algorithm},
+    year = {2020},
+    month = {02},
+    volume = {15},
+    url = {https://doi.org/10.1371/journal.pone.0228439},
+    pages = {1-28},
+    abstract = {In recent years, the number of vulnerabilities discovered and publicly disclosed has shown a sharp upward trend. However, the value of exploitation of vulnerabilities varies for attackers, considering that only a small fraction of vulnerabilities are exploited. Therefore, the realization of quick exclusion of the non-exploitable vulnerabilities and optimal patch prioritization on limited resources has become imperative for organizations. Recent works using machine learning techniques predict exploited vulnerabilities by extracting features from open-source intelligence (OSINT). However, in the face of explosive growth of vulnerability information, there is room for improvement in the application of past methods to multiple threat intelligence. A more general method is needed to deal with various threat intelligence sources. Moreover, in previous methods, traditional text processing methods were used to deal with vulnerability related descriptions, which only grasped the static statistical characteristics but ignored the context and the meaning of the words of the text. To address these challenges, we propose an exploit prediction model, which is based on a combination of fastText and LightGBM algorithm and called fastEmbed. We replicate key portions of the state-of-the-art work of exploit prediction and use them as benchmark models. Our model outperforms the baseline model whether in terms of the generalization ability or the prediction ability without temporal intermixing with an average overall improvement of 6.283% by learning the embedding of vulnerability-related text on extremely imbalanced data sets. Besides, in terms of predicting the exploits in the wild, our model also outperforms the baseline model with an F1 measure of 0.586 on the minority class (33.577% improvement over the work using features from darkweb/deepweb). The results demonstrate that the model can improve the ability to describe the exploitability of vulnerabilities and predict exploits in the wild effectively.},
+    number = {2},
 }
 
-@online{url:name-resolution,
-	Author = {The Cable Guy - Microsoft},
-	urldate = {2018-11-20},
-	Title = {Link-Local Multicast Name Resolution},
-	Url = {https://docs.microsoft.com/en-us/previous-versions//bb878128(v=technet.10)}
+@inproceedings{tang2020zerowall,
+  title={Zerowall: Detecting zero-day web attacks through encoder-decoder recurrent neural networks},
+  author={Tang, Ruming and Yang, Zheng and Li, Zeyan and Meng, Weibin and Wang, Haixin and Li, Qi and Sun, Yongqian and Pei, Dan and Wei, Tao and Xu, Yanfei and others},
+  booktitle={IEEE INFOCOM 2020-IEEE Conference on Computer Communications},
+  pages={2479--2488},
+  year={2020},
+  organization={IEEE}
 }
 
-@online{url:microsoft:name-resolution-order,
-	Author = {Microsoft},
-	urldate = {2018-11-20},
-	Title = {Microsoft TCP/IP Host Name Resolution Order},
-	Url = {https://support.microsoft.com/en-us/help/172218/microsoft-tcp-ip-host-name-resolution-order}
+@online{url:0-day-detection:darktrace,
+	Author = {Keith Siepel},
+	urldate = {2021-07-10},
+	Title = {Anatomy of a zero-day trojan caught by our Darktrace appliance},
+	Url = {https://www.darktrace.com/en/blog/anatomy-of-a-zero-day-trojan-caught-by-our-darktrace-appliance/}
 }
 
-@online{url:microsoft:sspi-model,
-	Author = {Microsoft},
-	urldate = {2018-12-12},
-	Title = {SSPI Model},
-	Url = {https://docs.microsoft.com/en-us/windows/desktop/secauthn/sspi-model}
+@online{url:0-day-detection:wehowsky,
+	Author = {Wehowsky},
+	urldate = {2021-07-10},
+	Title = {Can AI technology stop 0-day exploits like the one recently exposed in MS Exchange?},
+	Url = {https://www.wehowsky.com/can-ai-technology-stop-0-day-exploits-like-the-one-recently-exposed-in-ms-exchange/}
 }
 
-@online{url:microsoft:pass-the-hash-mitigation,
-	Author = {Microsoft},
-	urldate = {2018-12-12},
-	Title = {Mitigating Pass-the-Hash (PtH) Attacks and Other Credential Theft Techniques},
-	Url = {https://download.microsoft.com/download/7/7/a/77abc5bd-8320-41af-863c-6ecfb10cb4b9/mitigating%20pass-the-hash%20(pth)%20attacks%20and%20other%20credential%20theft%20techniques_english.pdf}
+@inproceedings{xiao2020mvp,
+  title={$\{$MVP$\}$: Detecting vulnerabilities using patch-enhanced vulnerability signatures},
+  author={Xiao, Yang and Chen, Bihuan and Yu, Chendong and Xu, Zhengzi and Yuan, Zimu and Li, Feng and Liu, Binghong and Liu, Yang and Huo, Wei and Zou, Wei and others},
+  booktitle={29th $\{$USENIX$\}$ Security Symposium ($\{$USENIX$\}$ Security 20)},
+  pages={1165--1182},
+  year={2020}
 }
 
-@online{url:microsoft:ntlm-message-syntax,
-	Author = {Microsoft},
-	urldate = {2018-12-24},
-	Title = {Microsoft NTLM - Message Syntax},
-	Url = {https://msdn.microsoft.com/en-us/library/cc236639.aspx}
-}
-
-%%%%%%%%%%%%%%%%%%%% RFC %%%%%%%%%%%%%%%%%%%%
-
-@techreport{url:rfc:netbios,
-	AUTHOR = "NetBIOS Working Group",
-	TITLE = "{Protocol standard for a NetBIOS service on a TCP/UDP transport: Concepts and methods}",
-	HOWPUBLISHED = {Internet Requests for Comments},
-	TYPE="{RFC}",
-	NUMBER=1002,
-	PUBLISHER = "{IETF}",
-	INSTITUTION = "{IETF}",
-	URL={https://tools.ietf.org/html/rfc1001}
-}
-
-@techreport{url:rfc:netbios-technical,
-	AUTHOR = "NetBIOS Working Group",
-	TITLE = "{Protocol standard for a NetBIOS service on a TCP/UDP transport: Detailed specifiations}",
-	HOWPUBLISHED = {Internet Requests for Comments},
-	TYPE="{RFC}",
-	NUMBER=1002,
-	PUBLISHER = "{IETF}",
-	INSTITUTION = "{IETF}",
-	URL={https://tools.ietf.org/html/rfc1002}
-}
-
-@techreport{url:rfc:llmnr,
-	AUTHOR = "Aboba et al.",
-	TITLE = "{Link-Local Multicast Name Resolution (LLMNR)}",
-	HOWPUBLISHED = {Internet Requests for Comments},
-	TYPE="{RFC}",
-	NUMBER=4795,
-	PUBLISHER = "{IETF}",
-	INSTITUTION = "{IETF}",
-	URL={https://tools.ietf.org/html/rfc4795}
-}
-
-@techreport{url:rfc:dns,
-	AUTHOR = "Mockapetris",
-	TITLE = "{Domain Names - Implementation and specifiation}",
-	HOWPUBLISHED = {Internet Requests for Comments},
-	TYPE="{RFC}",
-	NUMBER=1035,
-	PUBLISHER = "{IETF}",
-	INSTITUTION = "{IETF}",
-	URL={https://tools.ietf.org/html/rfc1035}
-}
-
-%%%%%%%%%%%%%%%%%%%% Misc %%%%%%%%%%%%%%%%%%%%
-@online{url:nbns-name-encoding,
-	Author = {Vladimir Gladkov - DZone - Integration Zone},
-	urldate = {2018-11-28},
-	Title = {Practical Fun with NetBIOS Name Service and Computer Browser Service},
-	Url = {https://dzone.com/articles/practical-fun-with-netbios-name-service-and-comput}
-}
-
-@online{url:ntlm-relaying,
-	Author = {BYT3BL33D3R},
-	urldate = {2018-01-04},
-	Title = {Practical guide to NTLM Relaying in 2017 (A.K.A getting a foothold in under 5 minutes)},
-	Url = {https://byt3bl33d3r.github.io/practical-guide-to-ntlm-relaying-in-2017-aka-getting-a-foothold-in-under-5-minutes.html}
-}
-
-@online{url:stackoverflow:windows-remote-commands,
-	Author = {Stackoverflow},
-	urldate = {2018-01-12},
-	Title = {How to execute a Windows command on a remote PC?)},
-	Url = {https://stackoverflow.com/questions/11935695/how-to-execute-a-windows-command-on-a-remote-pc#}
-}
-
-https://stackoverflow.com/questions/11935695/how-to-execute-a-windows-command-on-a-remote-pc#
-
-
-%%%%%%%%%%%%%%%%%%%% Hashes %%%%%%%%%%%%%%%%%%%%
-@online{url:hashes:hash-types,
-	Author = {Péter Gombos},
-	urldate = {2018-11-28},
-	Title = {LM, NTLM, Net-NTLMv2, oh my! - A Pentester’s Guide to Windows Hashes},
-	Url = {https://medium.com/@petergombos/lm-ntlm-net-ntlmv2-oh-my-a9b235c58ed4}
-}
-
-@online{url:hashes:netntlmv1-to-ntlm,
-	Author = {EvilMog},
-	urldate = {2018-11-28},
-	Title = {Reversing MSCHAPv2 to NTLM},
-	Url = {https://hashcat.net/forum/thread-5912.html}
-}
-
-@online{url:hashes:hashcat-example-hashes,
-	Author = {Hashcat},
-	urldate = {2018-01-04},
-	Title = {Example hashes},
-	Url = {https://hashcat.net/wiki/doku.php?id=example_hashes}
-}
-
-@online{url:microsoft:ssp-packages,
-	Author = {Microsoft},
-	urldate = {2018-01-12},
-	Title = {SSP Packages Provided by Microsoft},
-	Url = {https://docs.microsoft.com/en-us/windows/desktop/secauthn/ssp-packages-provided-by-microsoft}
-}
-
-%%%%%%%%%%%%%%%%%%%% LSASS %%%%%%%%%%%%%%%%%%%%
-@online{url:lsass:cred-in-memory,
-	Author = {Microsoft},
-	urldate = {2018-01-04},
-	Title = {Securing Privileged Access Reference Material},
-	Url = {https://docs.microsoft.com/en-us/windows-server/identity/securing-privileged-access/securing-privileged-access-reference-material}
-}
-
-@online{url:lsass:clear-text-2008,
-	Author = {BrandonWilson - Microsoft},
-	urldate = {2018-01-04},
-	Title = {The Importance of KB2871997 and KB2928120 for Credential Protection},
-	Url = {https://blogs.technet.microsoft.com/askpfeplat/2016/04/18/the-importance-of-kb2871997-and-kb2928120-for-credential-protection/}
-}
-
-@online{url:lsass:mimikatz,
-	Author = {Benjamin Delpy},
-	urldate = {2018-01-07},
-	Title = {Mimikatz},
-	Url = {https://github.com/gentilkiwi/mimikatz}
-}
-
-@online{url:lsass:mimikatz:sekurlsa,
-	Author = {Benjamin Delpy},
-	urldate = {2018-01-08},
-	Title = {Mimikatz},
-	Url = {https://github.com/gentilkiwi/mimikatz/wiki/module-~-sekurlsa}
-}
-
-%%%%%%%%%%%%%%%%%%%% Impacket %%%%%%%%%%%%%%%%%%%%
-@online{url:impacket:github,
-	Author = {SecureAuth Labs},
-	urldate = {2018-01-07},
-	Title = {Impacket},
-	Url = {https://github.com/SecureAuthCorp/impacket}
-}
-
-@online{url:impacket:wmiexec,
-	Author = {SecureAuth Labs},
-	urldate = {2018-01-07},
-	Title = {wmiexec.py},
-	Url = {https://github.com/SecureAuthCorp/impacket/blob/master/examples/wmiexec.py}
-}
-
-%%%%%%%%%%%%%%%%%%%% Implementation %%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%% Technologies %%%%%%%%%%%%%%%%%%%%
-@online{url:implementation:aspnet-core,
-	Author = {Microsoft},
-	urldate = {2018-01-09},
-	Title = {Introduction to ASP.NET Core},
-	Url = {https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-2.2}
-}
-
-@online{url:implementation:websockets,
-	Author = {Mozilla},
-	urldate = {2018-01-09},
-	Title = {The WebSocket API (WebSockets)},
-	Url = {https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API}
-}
-
-@online{url:implementation:signalr,
-	Author = {Microsoft},
-	urldate = {2018-01-10},
-	Title = {Introduction to ASP.NET Core SignalR},
-	Url = {https://docs.microsoft.com/en-us/aspnet/core/signalr/introduction?view=aspnetcore-2.2}
-}
-
-@online{url:implementation:javascript-frameworks,
-	Author = {Vijay Singh - Community Manager @ Hackr.io},
-	urldate = {2018-01-10},
-	Title = {Top Javascript Framework used in 2018},
-	Url = {https://www.codementor.io/vijaysingh782/top-javascript-framework-used-in-2018-oem84fncp}
-}
-
-%%%%%%%%%%%%%%%%%%%% Considerations %%%%%%%%%%%%%%%%%%%%
-@online{url:considerations:interface-drive-development-1,
-	Author = {Arash},
-	urldate = {2018-01-11},
-	Title = {Interface Driven Development (part 1)},
-	Url = {https://medium.com/@aaraashkhan/interface-driven-development-part-1-b7c7011860c0}
-}
-
-@online{url:considerations:interface-drive-development-2,
-	Author = {Arash},
-	urldate = {2018-01-11},
-	Title = {Interface Driven Development (part 2)},
-	Url = {https://medium.com/@aaraashkhan/interface-driven-development-part-2-4406ee738514}
-}
-
-@online{url:considerations:load-assembly-runtime,
-	Author = {Microsoft},
-	urldate = {2018-01-11},
-	Title = {How to: Load Assemblies into an Application Domain},
-	Url = {https://docs.microsoft.com/en-us/dotnet/framework/app-domains/how-to-load-assemblies-into-an-application-domain}
-}
-
-@online{url:considerations:newtonsoft,
-	Author = {Newtonsoft},
-	urldate = {2018-01-11},
-	Title = {Json.NET - Newtonsoft},
-	Url = {https://www.newtonsoft.com/json}
-}
-
-%%%%%%%%%%%%%%%%%%%% Implementation %%%%%%%%%%%%%%%%%%%%
-
-@online{url:implementation:singleton,
-	Author = {Jon Skeet},
-	urldate = {2018-01-14},
-	Title = {C\# in Depth: Implementing the Singleton Pattern},
-	Url = {http://csharpindepth.com/articles/general/singleton.aspx}
-}
-
-@online{url:implementation:microsoft:hosted-service,
-	Author = {Microsoft},
-	urldate = {2018-01-15},
-	Title = {Implement background tasks in microservices with IHostedService and the BackgroundService class},
-	Url = {https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/multi-container-microservice-net-applications/background-tasks-with-ihostedservice}
-}
-
-@online{url:implementation:microsoft:dependency-injection,
-	Author = {Steve Smith, Scott Addie and Luke Latham - Microsoft},
-	urldate = {2018-01-15},
-	Title = {Dependency injection in ASP.NET Core},
-	Url = {https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2}
-}
-
-@online{url:implementation:microsoft:unit-tests,
-	Author = {Microsoft},
-	urldate = {2018-01-15},
-	Title = {Unit test basics},
-	Url = {https://docs.microsoft.com/en-us/visualstudio/test/unit-test-basics?view=vs-2017}
-}
-
-@online{url:implementation:wireshark,
-	Author = {Wireshark},
-	urldate = {2018-01-15},
-	Title = {Wireshark - Go deep},
-	Url = {https://www.wireshark.org/}
-}
-
-@online{url:implementation:vue,
-	Author = {Evan You},
-	urldate = {2018-01-16},
-	Title = {Vue.js},
-	Url = {https://vuejs.org/}
-}
-
-@online{url:implementation:vue:vuex,
-	Author = {Evan You},
-	urldate = {2018-01-16},
-	Title = {What is Vuex?},
-	Url = {https://vuex.vuejs.org/}
-}
-
-@online{url:discussion:secure-string,
-	Author = {Microsoft},
-	urldate = {2018-01-16},
-	Title = {SecureString Class},
-	Url = {https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring?view=netframework-4.7.2}
-}
-
-@online{url:discussion:pypykatz,
-	Author = {Skellsec},
-	urldate = {2018-01-17},
-	Title = {Pypykatz},
-	Url = {https://docs.microsoft.com/en-us/dotnet/api/system.security.securestring?view=netframework-4.7.2}
+@inproceedings{li2016vulpecker,
+  title={Vulpecker: an automated vulnerability detection system based on code similarity analysis},
+  author={Li, Zhen and Zou, Deqing and Xu, Shouhuai and Jin, Hai and Qi, Hanchao and Hu, Jie},
+  booktitle={Proceedings of the 32nd Annual Conference on Computer Security Applications},
+  pages={201--213},
+  year={2016}
 }
