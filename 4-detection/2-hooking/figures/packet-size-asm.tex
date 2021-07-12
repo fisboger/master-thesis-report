@@ -1,0 +1,19 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{asm}
+movzx   r9d, word ptr [rdx+88h] ; Move with Zero-Extend
+mov     edx, [rdx+8Ch]
+mov     r13b, r8b
+add     edx, r9d        ; Add
+...
+cmp     edx, 0FFFFh     ; Compare Two Operands
+\end{minted}
+\caption{Low level calculation of packet size}
+\label{listing:detection:hooking:packet-size-asm}
+\end{listing}
+\end{document}

@@ -47,7 +47,7 @@ Having examined all the events present in any of the related functions from the 
 
 \todo{Maybe add paragraph about why looking at other ETW events is the same as network analysis which is probably easier}
 
-\subsection{Usage of \gls{ETW} for known vulnerabilities} 
+\subsection{\gls{ETW} event hunting}
 In the previous section we highlighted the usage of \gls{ETW} events used to report when the execution enters into unintended states, and how this cannot be used for detecting unknown vulnerabilities. A change that we did not highlight during the analysis of CVE-2021-24086 in \fullref{sec:CVE-2021-24086}, was the fact that a new call to \mintinline{c}{EtwWriteTransfer} was added in the patched version of \mintinline{c}{tcpip.sys}. The call can be seen in listing \ref{listing:detection:etw:post-patch-event} and is written when the size of the packet is above 0xFFFF bytes.
 
 \subimport{figures/}{post-patch-event.tex}
@@ -59,6 +59,7 @@ To understand how to filter \gls{ETW} events it is important to understand the \
 
 \subimport{figures/}{event-descriptor.tex}
 
+\subsection{Implementation}
 Both the \mintinline{c}{Level} and \mintinline{c}{Keyword} parameters are used to filter events when using the PowerShell function \mintinline{bash}{Add-EtwTraceProvider}. Looking at the specific event written, we can see that the \mintinline{c}{Level} is equal to \emph{Warning}\cite{url:etw:etw-event-descriptor} and the \mintinline{c}{Keyword} is equal to \emph{0x8000000200000080}. Listing \ref{listing:detection:etw:detection-post-patch:commands} shows exactly how to start a trace for this specific event and Lisiting \ref{listing:detection:etw:detection-post-patch:result} shows the result when trying to exploit CVE-2021-24086 on a patched Windows 10 machine.
 
 \subimport{figures/}{etw-detection-post-patch.tex}
@@ -68,7 +69,7 @@ As it can be seen, the message \emph{"Reassembly failure: packets do not add up 
 \\
 \\
 \subsection{Summary}
-THe previous sections contained a lot of technical knowledge on how to spot the usage of \gls{ETW} in binaries, how to analyze the API calls used and how to start a trace session for gathering specific events. While we can prove that \gls{ETW} can be used to detect unwanted execution states, we are unable to detect unintended execution states. We define unintended execution states as states that may potentially led to the exploitation of an, at the time the binary is compiled, unknown vulnerability.
+The previous sections contained a lot of technical knowledge on how to spot the usage of \gls{ETW} in binaries, how to analyze the API calls used and how to start a trace session for gathering specific events. While we can prove that \gls{ETW} can be used to detect unwanted execution states, we are unable to detect unintended execution states. We define unintended execution states as states that may potentially led to the exploitation of an, at the time the binary is compiled, unknown vulnerability.
 \\
 To answer the question of whether \gls{ETW} can be used to detect exploitation attempts of CVE-2021-24086 in unpatched Windows computers as asked in \ref{cha:introduction}, the answer is no. However, as shown, \gls{ETW} does have it place in detection engineering as the telemetry gained can be used to detect exploitation attempts of CVE-2021-24086 in patched Windows computers. Such a finding may not seem entirely relevant for this project, but it does showcase useful use cases for \gls{ETW} based vulnerability detection. If, for example, an event was written every time a packet was reassembled, and this event contained the reassembly size, it could be used to detect exploitation attempts. In fact, using \gls{wpp} in \mintinline{c}{tcpip.sys} to trace more generic events could very likely enable third-parties to better detect attempts at exploiting known vulnerabilities on unpatched systems.
 \todo{Maybe put this in some kind of conclusion. But it is gooooood though}

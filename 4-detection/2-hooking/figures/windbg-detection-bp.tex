@@ -1,0 +1,25 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{text}
+bp tcpip!Ipv6pReassembleDatagram ".echo Packet size:; ? wo(rdx+88) + wo(rdx+8c); .if (wo(rdx+88) + wo(rdx+8c)) > 0xFFFF {.echo CVE-2021-24086 exploitation attempt detected; gc; } .else {gc}"
+\end{minted}
+
+Where
+
+\begin{description}
+    \item[bp] Is the command to set a conditional breakpoint
+    \item[tcpip!Ipv6pReassembleDatagram] Is the address of the breakpoint
+    \item[.echo Packet size:; ? wo(rdx+88) + wo(rdx+8c);] Evaluates and print the packet size as described in listing \ref{listing:detection:hooking:c-function}
+    \item[.if (wo(rdx+88) + wo(rdx+8c)) > 0xFFFF] Evaluates a condition checking if the packet size is larger than 0xFFFF
+    \item[{.echo CVE-2021-24086 exploitation attempt detected; gc; }] Prints \emph{``CVE-2021-24086 exploitation attempt detected''} and continues the execution if the condition is met, indicating that an attempt to exploit CVE-2021-24086 is happening
+    \item[.else {gc}] Returns the execution if the condition is not met
+\end{description}
+\caption{WinDbg expression to simulate function hooking to detect CVE-2021-24086}
+\label{listing:detection:hooking:windbg-bp}
+\end{listing}
+\end{document}

@@ -1,0 +1,41 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{text}
+4: kd> bp tcpip!Ipv6pReassembleDatagram ".echo Packet size:; ? wo(rdx+88) + wo(rdx+8c); .if (wo(rdx+88) + wo(rdx+8c)) > 0xFFFF {.echo CVE-2021-24086 exploitation attempt detected; gc; } .else {gc}"
+breakpoint 0 redefined
+4: kd> g
+Packet size:
+Evaluate expression: 63720 = 00000000`0000f8e8
+Packet size:
+Evaluate expression: 63731 = 00000000`0000f8f3
+Packet size:
+Evaluate expression: 65528 = 00000000`0000fff8
+Packet size:
+Evaluate expression: 65539 = 00000000`00010003
+CVE-2021-24086 exploitation attempt detected
+
+KDTARGET: Refreshing KD connection
+
+*** Fatal System Error: 0x000000d1
+                       (0x0000000000000000,0x0000000000000002,0x0000000000000001,0xFFFFF8060D2A937B)
+
+Break instruction exception - code 80000003 (first chance)
+
+A fatal system error has occurred.
+Debugger entered on first try; Bugcheck callbacks have not been invoked.
+
+A fatal system error has occurred.
+
+For analysis of this file, run !analyze -v
+nt!DbgBreakPointWithStatus:
+fffff806`091fc440 cc              int     3
+\end{minted}
+\caption{Detection of CVE-2021-24086 using an WinDbg expression}
+\label{listing:detection:hooking:windbg-bp-output}
+\end{listing}
+\end{document}

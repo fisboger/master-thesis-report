@@ -1,0 +1,24 @@
+\documentclass{report}
+\usepackage{import}
+\subimport{../../../}{preamble.tex}
+\standalonetrue
+\begin{document}
+
+\begin{listing}[H]
+    \begin{minted}[breaklines, linenos, breakanywhere]{c}
+void __fastcall target_Ipv6pReassembleDatagram(__int64 *a1, struct_datagram *datagram, KIRQL a3)
+{
+    int unfragmentableHeaderLength = datagram[0x88];
+    int fragmentLength = datagram[0x8c];
+
+    int packetSize = unfragmentableHeaderLength + fragmentLength;
+
+    if(packetSize > 0xFFFF) {
+        // Log that an attempt to exploit CVE-2021-24086 has occurred
+    }
+}
+\end{minted}
+\caption{\mintinline{c}{Ipv6pReassembleDatagram} function hook target}
+\label{listing:detection:hooking:c-function}
+\end{listing}
+\end{document}
