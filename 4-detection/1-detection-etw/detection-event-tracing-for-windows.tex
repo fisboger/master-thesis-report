@@ -5,7 +5,7 @@
 \begin{document}
 
 % sample content
-\section{\acrfull{ETW}}
+\section{\glsentrytext{ETW}}
 \label{sec:detection:etw}
 With \gls{ETW}, the provider has to provide events, meaning a call to one of the tracing APIs has to be there. When reverse engineering binaries it is possible to look for such events to discover if they are used. As we are mainly concerned about \gls{ETW} events sent by \mintinline{c}{tcpip.sys} examining said binary is a good starting point. \mintinline{c}{tcpip.sys} registers itself as a \gls{wpp} provider and therefore uses the kernel mode functions \mintinline{c}{EtwWrite} and \mintinline{c}{EtwWriteTransfer}\cite{url:etw:kernel-mode-functions}. To examine the usage of \mintinline{c}{EtwWriteTransfer}, we can look at figure \ref{fig:detection:etw:etwwritetransfer-refs} where it shows that only 34 references to \mintinline{c}{EtwWriteTransfer} exists.
 
@@ -47,7 +47,7 @@ Having examined all the events present in any of the related functions from the 
 
 \todo{Maybe add paragraph about why looking at other ETW events is the same as network analysis which is probably easier}
 
-\subsection{\gls{ETW} event hunting}
+\subsection{\glsentrytext{ETW} event hunting}
 In the previous section we highlighted the usage of \gls{ETW} events used to report when the execution enters into unintended states, and how this cannot be used for detecting unknown vulnerabilities. A change that we did not highlight during the analysis of CVE-2021-24086 in \fullref{sec:CVE-2021-24086}, was the fact that a new call to \mintinline{c}{EtwWriteTransfer} was added in the patched version of \mintinline{c}{tcpip.sys}. The call can be seen in listing \ref{listing:detection:etw:post-patch-event} and is written when the size of the packet is above 0xFFFF bytes.
 
 \subimport{figures/}{post-patch-event.tex}
