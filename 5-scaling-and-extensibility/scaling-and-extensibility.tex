@@ -65,14 +65,7 @@ The most important part of scaling and automating the detection of vulnerabiliti
 Automating the information gathering is a somewhat simple task. The binary comparison can be fully handled by BinDiff\cite{url:bindiff:homepage}, whereafter the information can be extracted. BinDiff uses a undocumented binary format with the extension \mintinline{text}{.BinExport}, so extraction the information is somewhat cumbersome. With that said however, the Ghidra\cite{url:ghidra:homepage} extension BinDiffHelper\cite{url:BinDiffHelper:homepage} has code to extract the necessary information from the binary format. We can most likely reuse this code without much effort.
 
 \subsection{Root-cause analysis}
-
-% This is the difficult part
-% Mention many vulnerability types
-% Hard to say exactly how with more analysis. We need to analyze more vulnerabilities with different vulnerability types
-% For overflows we can most likely look for a CMP instruction (at least in many cases)
-% Take integer overflow as example
-%   Might just be a simple register change
-% Very complex and hard to get right -> Requires manual work
+To be able to detect a vulnerability, knowing what caused it is a very important step. If we consider CVE-2021-24086, the root-cause was a null pointer dereference due to a length not being checked correctly. So while the root-cause is a null pointer dereference, the detection does not directly detect the null pointer dereference. The detection worked by looking for the symptom leading to a null pointer dereference. However, as the Windows kernel and privileged applications are mainly written in C and C++, many other vulnerability types are prevalent. An unexhaustive list of the most common vulnerability types can be seen here:
 
 \begin{enumerate}
     \item Null pointer dereference
@@ -84,6 +77,30 @@ Automating the information gathering is a somewhat simple task. The binary compa
     \item Integer overflow
     \item Logic bugs
 \end{enumerate}
+
+As one can probably imagine, most of these vulnerability types are not fixed in the same way, and in some instances the same bug class might be fixed in different ways as well.
+\\
+\\
+If we examine one vulnerability type, integer overflows, we can see the complexity of analyzing the root-cause. Imagine a scenario where a buffer is allocated with the size calculated as the sum two 16 bit unsigned integers. The length of the buffer is stored in a 16 bit register as an unsigned integer. In cases like these the integer will overflow such that the buffer size will be calculated as such:
+\begin{align}
+    \text{bufferSize} = &u_1 + u_2 = (u_1 + u_2) - 65535 \\
+    \text{When }&u_1 + u_2 > 65535 \nonumber
+\end{align}
+
+In instances like these, the flaw might be fixed in two different ways depending on what part of the logic is flawed. In cases where the buffer is never supposed to be bigger than 16 bits a bounds check must be added. This is usually reflected as a \mintinline{asm}{cmp} instruction in the assembly checking if the sum of the two 16 bit unsigned registers is larger than 0xFFFF. If the issue lies within the fact that the buffer has the wrong maximum size, the 16 it register could simply be swapped with a 32 bit register.
+\\
+\\
+As the example highlights, finding the actual root-cause of a vulnerability is not easily achieved. For just one vulnerability type, at least two obvious root-causes with fixes can be found. Another issue is also the fact that at the time of root-cause analysis, we do not know the vulnerability type. This makes it incrementally more difficult to define the root-cause, as you are restricted to only basing your analysis on the changes in the binary. Additionally, the same binary often contains more than one vulnerability, as seen in the patch tuesday of July 2021\cite{url:patch-tuesday:2021:july} which patched nine vulnerabilities in Windows DNS Server.
+% The point we are trying to get across here, is that automatic root-cause analysis is very complicated to get 100\% right. 
+
+% This is the difficult part
+% Mention many vulnerability types
+% Hard to say exactly how with more analysis. We need to analyze more vulnerabilities with different vulnerability types
+% For overflows we can most likely look for a CMP instruction (at least in many cases)
+% Take integer overflow as example
+%   Might just be a simple register change
+% Very complex and hard to get right -> Requires manual work
+
 
 \subsection{Detection logic}
 % Creating logic is also difficult
