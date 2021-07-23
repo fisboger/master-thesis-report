@@ -22,7 +22,7 @@ Getting a list of all available providers in Windows is fairly simply. A few met
     \item Enumerate registry keys under \mintinline{c}{HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WINEVT\Publishers}
 \end{enumerate}
 
-The output from method \emph{(3)}, the registry, is as mentioned in \fullref{sec:etw:providers:manifest-based}, only for manifest-based providers. Therefore, not all providers will be shown here. \fullref{fig:etw:providers:registry} shows how the information available using Registry Editor. As it can be seen the registry contains information about the binary the provider is implemented in, which in our case is \mintinline{c}{tcpip.sys}. 
+The output from method \emph{(3)}, the registry, is as mentioned in \fullref{sec:etw:providers:manifest-based}, only for manifest-based providers. Therefore, not all providers will be shown here. \fullref{fig:etw:providers:registry} shows the information for each provider that is available using Registry Editor. As it can be seen the registry contains information about which binary the provider is implemented in, which in our case is \mintinline{c}{tcpip.sys}. 
 
 \subimport{figures/}{etw-providers-registry.tex}
 
@@ -51,7 +51,7 @@ The same information queried using \mintinline{bash}{logman query providers} can
 The number of providers registered according to \mintinline{c}{logman query providers} is 1162 whereas 972 of these are manifest-based providers according to data from the registry. One example of a non-manifest-based provider that can only be found using logman is the provider \emph{TCPIP Service Trace} as seen on line 15 in listing \ref{listing:etw:provider:logman}.
 \\
 \\
-Using the second method, \mintinline{bash}{Get-TraceEtwProvider}, simply yields a \mintinline{bash}{Access Denied} error rendering it useless.
+Using the second method, \mintinline{bash}{Get-TraceEtwProvider}, simply yield a \mintinline{bash}{Access Denied} error rendering it useless.
 \\
 \\
 To conclude this section, we were able to find two different providers related to the TCP/IP stack on Windows. The first provider, \emph{Microsoft-Windows-TCPIP} is definitely related to \mintinline{c}{tcpip.sys} according to the \emph{ResourceFileName} property. The second however is a bit more cumbersome as logman does not provide any more information than the name (\emph{TCPIP Service Trace}) and the GUID.
@@ -77,12 +77,12 @@ In these three simple steps, we will be acting as the \gls{ETW} controller throu
 \label{listing:etw:starting-trace}
 \end{listing}
 
-The code is explained here:\todo{Explain bitmask}
+The code is explained here:
 \begin{description}
     \item[New-EtwTraceSession] Starts a new trace with the name \emph{TCPIPTrace} and sets the \mintinline{bash}{LogFileMode} to \mintinline{c}{EVENT_TRACE_USE_LOCAL_SEQUENCE} and \mintinline{c}{EVENT_TRACE_REAL_TIME_MODE}\cite{url:etw:trace:logging-mode-constants}. The \mintinline{bash}{FlushTimer} argument states that the buffer should be flushed every second
-    \item[Add-EtwTraceProvider] Adds the \emph{Microsoft-Windows-TCPIP} provider to the session matching any keywords (ie. we will consume all event keywords)\todo{Maybe explain event keywords, and also how to get them}
+    \item[Add-EtwTraceProvider] Adds the \emph{Microsoft-Windows-TCPIP} provider to the session matching any keywords using a bit mask (In this example we will consume all event keywords using the bit mask 0x0)
     \item[tracefmt] Displays the content of the trace in the current console every time the buffer is flushed
 \end{description}
 
-At this point we are able to consume all events produced by \mintinline{c}{tcpip.sys}, and are therefore at a good position to consider how the data can be used for detection. However, in order to know exactly what to detect, it is important to first analyze CVE-2021-24086. In the next \fullref{cha:vulnerability-analysis} we will begin analyzing CVE-2021-24086 in order to understand exactly what we need to detect.\todo{Rewrite this at some point}
+At this point we are able to consume all events produced by \mintinline{c}{tcpip.sys}, and are therefore at a good position to consider how the data can be used for detection. However, in order to know exactly what to detect, it is important to first understand CVE-2021-24086, which will be done in \fullref{cha:vulnerability-analysis}. In this chapter we will analyze CVE-2021-24086 in order to understand exactly what we need to detect.
 \end{document}

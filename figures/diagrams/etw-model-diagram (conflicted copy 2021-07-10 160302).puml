@@ -1,0 +1,39 @@
+@startuml
+' skinparam linetype ortho
+' node node1
+' node node2
+' node node3
+' node node4
+' node node5
+' node1 -- node2 : label1
+' node1 .. node3 : label2
+' node1 ~~ node4 : label3
+' node1 == node5
+
+together {
+    collections Providers
+    collections Consumers
+}
+
+collections Controllers
+
+rectangle "Event Tracing Sessions" as EventTracingSessions {
+    storage Buffer1
+    storage Buffer2
+    storage BufferX
+}
+
+Controllers -d-> EventTracingSessions
+EventTracingSessions -u-> Controllers
+
+
+
+EventTracingSessions <-d-- Providers : Events
+EventTracingSessions -d--> Consumers : Real-time delivery
+
+database "Log files" as LogFiles
+
+EventTracingSessions -r-> LogFiles : Events
+LogFiles -d-> Consumers : Logged Events
+' Providers -u--> EventTracingSessions : Events
+@enduml

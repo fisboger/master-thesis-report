@@ -7,53 +7,53 @@
 % sample content
 \chapter{Discussion}
 \label{cha:scaling-and-automation}
-The final chapter of this project is dedicated to exploring the work that has been done in relation to scalability and automation. We imagine the end goal of the path we started on with this project to be an almost fully automated \gls{SAAS} solution that can be used to detect vulnerabilities on machines that cannot be patched immediately.
+The final chapter of this project is dedicated to exploring the work that has been done in relation to scalability and automation. If the techniques proposed in this project can be applied to a broader scope of vulnerabilities, we imagine the result can be used to build a fully automated vulnerability detection application.
 \\
 \\
-To highlight the work needed to reach the final goal, we will first compare function hooking and \gls{ETW}, explore exactly what information can be extracted from a patch, and hereafter use this information to discuss how all of the work done to detect CVE-2021-24086 might be applied in an automated and scalable way to detect other vulnerabilities.
+To highlight the work needed to reach the final goal, we will first compare function hooking and \gls{ETW}, explore exactly what information can be extracted from a patch, and hereafter use this information to discuss how the work done to detect CVE-2021-24086 might be applied in an automated and scalable way to detect other vulnerabilities.
 
 \section{Comparison of function hooking and \glsentrytext{ETW}}
-In the previous chapters we have explored the world of Windows telemetry, analyzed a recent and critical vulnerability, and hereafter combined all of the knowledge gained to detect the vulnerability using the explored telemetry sources. In this chapter we will be exploring and discussing how the techniques used to detect CVE-2021-24086 possibly could be used to detect other vulnerabilities. Furthermore, we will also explore if, and possible how, we can automate the whole process to automatically detect exploitation of all recent vulnerabilities given a patch.
+In the previous chapters we have explored the world of Windows telemetry, analyzed a recent and critical vulnerability, and hereafter combined all of the knowledge gained to detect the vulnerability using the explored telemetry sources. In this chapter we will be exploring and discussing how the techniques used to detect CVE-2021-24086 possibly could be used to detect other vulnerabilities. Furthermore, we will also explore if, and possible how, we can automate the whole process to automatically detect exploitation of a large subset of all recent vulnerabilities given a patch.
 \\
 \\
-To detect CVE-2021-24086 we explored both \gls{ETW} and function hooking to gather relevant telemetry to discover a vulnerability in Windows. Unfortunately, we discovered that the detection opportunities, at least for CVE-2021-24086 and other vulnerabilities in \mintinline{c}{tcpip.sys}, are not great with \gls{ETW} as most telemetry herein is based on entering \emph{known} unintended states. With function hooking however, we get to define what is an unintended state and can therefore tailor our telemetry to our specific detection needs.
+To detect CVE-2021-24086 we explored both \gls{ETW} and function hooking to gather relevant telemetry to discover a vulnerability in Windows. Unfortunately, we discovered that the detection opportunities, at least for CVE-2021-24086 and other vulnerabilities present in \mintinline{c}{tcpip.sys}, are not great with \gls{ETW} as most telemetry herein is based on entering \emph{known} unintended states. With function hooking however, we get to define what is an unintended state and can therefore tailor our telemetry to our specific detection needs.
 \\
 \\
-If we disregard the fact that \gls{ETW} telemetry was not sufficient to detect CVE-2021-24086, we still want to compare the two methods in order to give the reader an overview of weaknesses and strengths for each method. The results of this analysis can be seen in \ref{tab:comparison:comparison}
+If we disregard the fact that \gls{ETW} telemetry was not sufficient to detect CVE-2021-24086, we still want to compare the two methods in order to give the reader an overview of weaknesses and strengths for each method. The results of this analysis can be seen in table \ref{tab:comparison:comparison}
 
 {
     \setlength\LTleft{-0.1\textwidth}%
     \begin{tabularx}{1.25\textwidth}{X|X|X|}
     \textbf{}             & \textbf{Function hooking}                                                                                      & \textbf{\gls{ETW}}                                                                                      \\ \hline
-    \multirow{2}{*}{Cons} & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}l@{}}Complex\\ Long development time\end{tabular}}                                                                                                                                              \\ \cline{2-3} 
-                          & \begin{tabular}[c]{@{}l@{}}No tolerance for error\\ Might slow down the computer\\ Kernel mode\end{tabular}    & \begin{tabular}[c]{@{}l@{}}Unable to customize events\\ Not able to create custom events\\ Lack of events\\ Unable to detect CVE-2021-24086\end{tabular} \\ \hline
+    \multirow{2}{*}{Cons} & \multicolumn{2}{l|}{\begin{tabular}[c]{@{}l@{}}Complex\end{tabular}}                                                                                                                                              \\ \cline{2-3} 
+                          & \begin{tabular}[c]{@{}l@{}}No tolerance for error\\ Might slow down the computer\\ Kernel mode\\ Long development time\end{tabular}    & \begin{tabular}[c]{@{}l@{}}Unable to customize events\\ Lack of events\\ Not able to create custom events\\ Unable to detect CVE-2021-24086\end{tabular} \\ \hline
     \multirow{2}{*}{Pros} & \multicolumn{2}{l|}{Custom event filtering}                                                                                                                                                                                               \\ \cline{2-3} 
-                          & \begin{tabular}[c]{@{}l@{}}Customize detection to specfic vulnerabilities\\ High level of control\\ Able to detect CVE-2021-24086\end{tabular} & \begin{tabular}[c]{@{}l@{}}Built-in to Windows\\ Robust\\ Fast\\ User mode\end{tabular}     \\                            
+                          & \begin{tabular}[c]{@{}l@{}}Customize detection to specfic vulnerabilities\\ High level of control\\ \textbf{Able to detect CVE-2021-24086}\end{tabular} & \begin{tabular}[c]{@{}l@{}}Built-in to Windows\\ Robust\\ Fast\\ User mode\end{tabular}     \\                            
 \caption{Comparison of function hooking and \gls{ETW}}
 \label{tab:comparison:comparison}
     \end{tabularx}
 }
 
-As function hooking and \gls{ETW} is so fundamentally different, it is hard to compare them in a proper way. Function hooking has a high level of customization which also brings a high level of complexity. \gls{ETW}, while still being somewhat complex, works out of the box, has a high level of robustness, but gives very little in terms of customization. Furthermore, \gls{ETW} could only be used to detect CVE-2021-24086 after the patch was applied, which is not that valuable in regards to the scope of this project. Given more vulnerabilities, we do believe that \gls{ETW} could show its worth, but it is impossible to say without analyzing more vulnerabilities. Perhaps a combination of function hooking and \gls{ETW} is optimal, as both can be run at the same time without large penalties, both in regards to performance, security and scalability.
+As function hooking and \gls{ETW} is so fundamentally different, it is hard to compare them in a proper way. Function hooking has a high level of customization which also brings a high level of complexity. \gls{ETW}, while still being somewhat complex, works out of the box, has a high level of robustness, but gives very little in terms of customization. Furthermore, \gls{ETW} could only be used to detect CVE-2021-24086 after the patch was applied, which is not that valuable in regards to the scope of this project. Given more vulnerabilities, we do believe that \gls{ETW} could show its worth, but it is impossible to say without further work analyzing more vulnerabilities. Perhaps a combination of function hooking and \gls{ETW} is optimal, as both can be run at the same time without large penalties, both in regards to performance, security and scalability.
 
 \section{Patch information}
-In \fullref{sec:CVE-2021-24086} we analyzed and reproduced a vulnerability using only publicly available information and information gained from the patch. While publicly information was very scarce, extracting information from the patch gave us very valuable and usable information quickly revealing the root-cause of the vulnerability. While developing a full fledged \gls{POC} took a lot of time, revealing the root-cause of the vulnerability was very quick.
+In \fullref{sec:CVE-2021-24086} we analyzed and reproduced a vulnerability using only publicly available information and information gained from the patch. While publicly available information was very scarce, extracting information from the patch gave us very valuable and usable information quickly revealing the root-cause of the vulnerability. While developing a full fledged \gls{POC} took a lot of time, revealing the root-cause of the vulnerability was very quick.
 \\
 \\
 The goal of this project is mainly to discover the information given by a patch, and determine if this information can be used to detect the vulnerability in an unpatched system. Therefore, we must detail exactly what information can be extracted from a patch given the right tools such as BinDiff\cite{url:bindiff:homepage} and IDA Pro\cite{url:ida-pro:homepage}:
 
 \begin{enumerate}
-    \item Very precise byte by byte of the binary changes
+    \item Very precise byte by byte changes of the binary
     \item Which functions were modified, including confidence and similarity analysis
     \item Specific addresses where code was modified, added or removed
     \item Changes on the assembly level
-    \item Additions to the binary
+    \item Additions to the binary, such as new functions
 \end{enumerate}
 
 Luckily for us, all security patches are distributed separately from feature upgrades, allowing us to only look at changes we know are related to security.
 \\
 \\
-To relate the patch information to detection, it gave us the knowledge of what function triggers the vulnerability (\mintinline{c}{Ipv6pReassembleDatagram}), the assembly comparison added to fix the vulnerability, and the added \gls{ETW} telemetry to detect the now known unintended state. To detect CVE-2021-24086 without a patch or a reliable \gls{POC}, would ultimately require us to rediscover the vulnerability based purely on publicly available information. We deem this infeasible for us, and most likely many other security professionals, and certainly deem it infeasible to do on a larger scale.
+If we were to relate patch information to detection, it is important to highlight just how much information was gathered from the patch. First of all, using the list of modified functions, we were quickly able to locate the vulnerable function (\mintinline{c}{Ipv6pReassembleDatagram}). To detect CVE-2021-24086 without a patch or a reliable \gls{POC}, would ultimately require us to rediscover the vulnerability based purely on publicly available information. We deem this infeasible for us, and most likely many other security professionals, and certainly deem it infeasible to do on a larger scale.
 \\
 \\
 When patch information is analyzed by someone with the right skills within vulnerability research, it gives tremendous value both in detection purposes, but definitely also within exploitation purposes. The question remains however, whether the right information can be gathered programmatically and in a way that is easy to scale and automate. The next sections will explore this further.
@@ -62,10 +62,10 @@ When patch information is analyzed by someone with the right skills within vulne
 The most important part of scaling and automating the detection of vulnerabilities given a patch is to extract the patch information and interpret it correctly. The following sections will first explore how information can be extracted without human interaction and hereafter how to detect the root-cause of a vulnerability and use that information to create detection logic to detect it.
 
 \subsection{Information gathering}
-Automating the information gathering is a somewhat simple task. The binary comparison can be fully handled by BinDiff\cite{url:bindiff:homepage}, whereafter the information can be extracted. BinDiff uses a undocumented binary format with the extension \mintinline{text}{.BinExport}, so extraction the information is somewhat cumbersome. With that said however, the Ghidra\cite{url:ghidra:homepage} extension BinDiffHelper\cite{url:BinDiffHelper:homepage} has code to extract the necessary information from the binary format. We can most likely reuse this code without much effort.
+Automating information gathering is a somewhat simple task. The binary comparison can be fully handled by a tool such as BinDiff\cite{url:bindiff:homepage}, whereafter the information can be extracted. BinDiff uses a undocumented binary format with the extension \mintinline{text}{.BinExport}, making the extraction of the information somewhat cumbersome. With that said however, the Ghidra\cite{url:ghidra:homepage} extension BinDiffHelper\cite{url:BinDiffHelper:homepage} has code to extract the necessary information from the binary format which we can most likely reuse without much effort.
 
 \subsection{Root-cause analysis}
-To be able to detect a vulnerability, knowing what caused it is a very important step. If we consider CVE-2021-24086, the root-cause was a null pointer dereference due to a length not being checked correctly. So while the root-cause is a null pointer dereference, the detection does not directly detect the null pointer dereference. The detection worked by looking for the symptom leading to a null pointer dereference. However, as the Windows kernel and privileged applications are mainly written in C and C++, many other vulnerability types are prevalent. An unexhaustive list of the most common vulnerability types can be seen here:
+To be able to detect a vulnerability, knowing what caused it is a very important step. If we consider CVE-2021-24086, the root-cause was a null pointer dereference due to a length not being checked correctly. So while the root-cause is a null pointer dereference, the detection does not directly detect the null pointer dereference. The detection actually worked by looking for the symptom leading to a null pointer dereference. However, as the Windows kernel and privileged applications are mainly written in C and C++, many other vulnerability types are prevalent. An unexhaustive list of the most common vulnerability types can be seen here:
 
 \begin{enumerate}
     \item Null pointer dereference
@@ -78,12 +78,12 @@ To be able to detect a vulnerability, knowing what caused it is a very important
     \item Logic bugs
 \end{enumerate}
 
-As one can probably imagine, most of these vulnerability types are not fixed in the same way, and in some instances the same bug class might be fixed in different ways as well.
+As one can probably imagine, most of these vulnerability types are not fixed in the same way, and in some instances the same vulnerability type might be fixed in different ways as well.
 \\
 \\
-If we examine one vulnerability type, integer overflows, we can see the complexity of analyzing the root-cause. Imagine a scenario where a buffer is allocated with the size calculated as the sum two 16 bit unsigned integers. The length of the buffer is stored in a 16 bit register as an unsigned integer. In cases like these the integer will overflow such that the buffer size will be calculated as such:
+If we examine one vulnerability type, such as integer overflows, we can see the complexity of analyzing the root-cause. Imagine a scenario where a buffer is allocated with the size calculated as the sum two 16 bit unsigned integers. The length of this buffer is stored in a 16 bit register as an unsigned integer. In cases like these the integer can overflow such that the buffer size will be calculated as such:
 \begin{align}
-    \text{bufferSize} = &u_1 + u_2 = (u_1 + u_2) - 65535 \\
+    \text{bufferSize} = uint16(&u_1 + u_2) = (u_1 + u_2) - 65535 \\
     \text{When }&u_1 + u_2 > 65535 \nonumber
 \end{align}
 

@@ -8,7 +8,7 @@
 \section{Function hooking}
 \label{sec:detection:function-hooking}
 
-As explained in \fullref{sec:hooking} function hooking can be used to temporarily redirect execution of one function to another, effectively intercepting the function. Using \mintinline{c}{Ipv6pReassembleDatagram} from \mintinline{c}{tcpip.sys} as an example, using event hooking we could intercept the function call coming from \mintinline{c}{Ipv6pReceiveFragment}. With function hooking we essentially create a function with the exact same signature as the original function, run this first and then return the execution to the source function. In order to detect exploitation attempts of CVE-2021-24086 we must construct a redirection function with the following requirements:
+As explained in \fullref{sec:hooking} function hooking can be used to temporarily redirect execution of one function to another, effectively intercepting the function. Using \mintinline{c}{Ipv6pReassembleDatagram} from \mintinline{c}{tcpip.sys} as an example, using event hooking we could intercept the function call coming from \mintinline{c}{Ipv6pReceiveFragment}. With function hooking we essentially create a function with the exact same signature as the original function, run this first and then return the execution to the source function. In order to detect exploitation attempts of CVE-2021-24086 we must construct a target function with the following requirements:
 
 \begin{itemize}
     \item It must match the signature for \mintinline{c}{Ipv6pReassembleDatagram}
@@ -22,31 +22,31 @@ For the second requirement we have to dig a bit deeper into the structure of the
 
 \subimport{figures/}{packet-size-asm.tex}
 
-In the calculation we can observe two offsets, \mintinline{asm}{rdx + 0x88} and \mintinline{asm}{rdx + 0x8c}. From dynamic analysis we can observe that these correspond to the unfragmentable header length and the fragmentable length respectively. Translating this into a C-style function suitable as the target of a function hook will give the result as seen on listing \ref{listing:detection:hooking:c-function}
+In the calculation we can observe two offsets, \mintinline{asm}{rdx + 0x88} and \mintinline{asm}{rdx + 0x8c}. From dynamic analysis we can observe that these correspond to the unfragmentable header length and the fragmentable length respectively. The construction of a target function using C pseudo code can be seen on listing \ref{listing:detection:hooking:c-function}.
 
 \subimport{figures/}{c-function.tex}
 
 Using this target function we would be able to detect if the packet size is larger than 0xFFFF and hereby be able to detect the root-cause of CVE-2021-24086. While it is not within the scope of this project, using a technique such as trampoline hooking, as explained in \fullref{sec:hooking}, we might even be able to hijack the execution effectively preventing the exploit from stealing the execution.
 
 \subsection{Implementation}
-Implementing a full-fledged kernel function hooking driver requires substantial amount of time and effort. As discussed in \fullref{sec:hooking:kernel-mode}, kernel mode function hooking need to bypass a large amount of security features, while also being signed by Microsoft. Even if one is able to bypass or disable all the security features, there is still a ton of stability issues to address and test against. As the goal of this project is to investigate whether or not it is possible to detect vulnerabilities using information gained from patches, we deem it unnecessary to implement a full kernel driver to do prove so. Instead of developing a kernel driver, we decided to implement a WinDbg expression\cite{url:windbg:expression} to simulate a function hook for \mintinline{c}{Ipv6pReassembleDatagram}.
+Implementing a full-fledged kernel function hooking driver requires substantial amount of time and effort. As discussed in \fullref{sec:hooking:kernel-mode}, kernel mode function hooking need to bypass a large amount of security features, while also being signed by Microsoft. Even if one is able to bypass or disable all the security features, there is still a ton of stability issues to address and test thoroughly against. As the goal of this project is to investigate whether or not it is possible to detect vulnerabilities using information gained from patches, we deem it unnecessary to implement a full kernel driver to do so. Instead of developing a kernel driver, we decided to implement a WinDbg expression\cite{url:windbg:expression} to simulate a function hook for \mintinline{c}{Ipv6pReassembleDatagram}.
 \\
 Using a simulation instead of a fully-fledged kernel driver allows us to easily test our hypothesis without weakening the security of the vulnerable host. A WinDbg expression to simulate function hooking that is able to detect CVE-2021-24086 can be seen in listing \ref{listing:detection:hooking:windbg-bp}.
 
 \subimport{figures/}{windbg-detection-bp.tex}
 
-\paragraph{Detecting CVE-2021-24086 using function hooking simulation.} To test the WinDbg expression we did two things. First of all we led it run for 24 hours on a vulnerable VM to ensure that no false positives were caught. Afterwards we sent two Ipv6 packets to a vulnerable host, of which the details can be seen here:
+\paragraph{Detecting CVE-2021-24086 using function hooking simulation.} To test the WinDbg expression we did two things. First of all we let it run for 24 hours on a vulnerable VM to ensure that no false positives were caught. Afterwards we sent two Ipv6 packets to a vulnerable host, of which the details can be seen here:
 \begin{itemize}
     \item One packet where we took the full PoC and removed one Options Header from it, making the total packet length 0xF8F3.\\This should not be detected as an exploitation attempt
     \item One packet that triggers CVE-2021-24086
 \end{itemize}
 
-The output of all tests can be seen in listing \ref{listing:detection:hooking:windbg-bp-output}, where one can also see the expression being executed. As one can see, a total of four reassembled packets have been received, which corresponds to the two packets we sent. We must remember that due to nested fragments, as explained in \fullref{cve-2021-24086:triggering}, Windows will reassemble two different packets into one, which is why we are seeing four packets instead of the two sent. Line 11 shows the detection of CVE-2021-24086, and right after execution is continued we are notified of the \emph{``Fatal System Error''} due to the successful exploitation of CVE-2021-24086.
+As it can be seen in listing \ref{listing:detection:hooking:windbg-bp-output}, where one can also see the expression being executed, a total of four reassembled packets have been received, which corresponds to the two packets we sent. We must remember that due to nested fragments, as explained in \fullref{cve-2021-24086:triggering}, Windows will reassemble two different packets into one, which is why we are seeing four packets instead of the two sent. Line \emph{(11}) shows the detection of CVE-2021-24086, and right after execution is continued we are notified of the \emph{``Fatal System Error''} due to the successful exploitation of CVE-2021-24086.
 
 \subimport{figures/}{windbg-detection-output.tex}
 
 \subsection{Summary}
 
-Using our WinDbg expression script to simulate how function hooking would work to detect CVE-2021-24086 shows the value of function hooking in detection vulnerabilities. Using the information gathered from the patch of CVE-2021-24086 we were successfully able to detect an exploitation attempt of CVE-2021-24086.
+Using our WinDbg expression script to simulate how function hooking would work to detect CVE-2021-24086 shows the value of function hooking in detecting vulnerabilities. Using the information gathered from the patch of CVE-2021-24086 we were successfully able to detect an exploitation attempt of said vulnerability.
 
 \end{document}

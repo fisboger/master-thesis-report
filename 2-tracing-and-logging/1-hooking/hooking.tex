@@ -39,7 +39,7 @@ func1(int a, int b, int c, int d, int e, int f);
 
 \subimport{figures/}{function-hooking.tex}
 
-To redirect the execution of the source function to a target function, the instruction \mintinline{asm}{JMP}\cite{url:hooking:asm:ret} can be used. This instruction will return to the address located on the stack. The assembly code on listing \ref{listing:asm:intercept} shows how this is done. The assembly should be written to memory at the beginning of the source function.
+To redirect the execution of the source function to a target function, the instruction \mintinline{asm}{RET}\cite{url:hooking:asm:ret} can be used. This instruction will return to the address located on the stack. The assembly code on listing \ref{listing:asm:intercept} shows how this is done. The assembly should be written to memory at the beginning of the source function.
 
 \begin{listing}[H]
 \begin{minted}[breaklines, linenos, breakanywhere]{asm}
@@ -52,7 +52,7 @@ RET
 \label{listing:asm:intercept}
 \end{listing}
 
-\paragraph{Returning to source function.} When hooking a function, you often want to return back to the original function. Two considerations are needed when doing so. First off, the target function must restore the parameters originally passed to the source function in order to continue execution. Secondly, the hook it self must be temporarily removed by restoring the replaced bytes, such that calling the source function will not redirect to the target function again. Failing to do so will result in an infinite loop. Listing \ref{listing:c:hooking-prototype} shows a simplified prototype written in C++
+\paragraph{Returning to source function.} When hooking a function, you often want to return back to the original function. Two considerations are needed when doing so. First off, the target function must restore the parameters originally passed to the source function in order to continue execution. Secondly, the hook itself must be temporarily removed by restoring the replaced bytes, such that calling the source function will not redirect to the target function again. Failing to do so will result in an infinite loop. Listing \ref{listing:c:hooking-prototype} shows a simplified prototype written in C++ of the entire interception process.
 
 \begin{listing}[H]
 \begin{minted}[breaklines, linenos, breakanywhere]{c++}
