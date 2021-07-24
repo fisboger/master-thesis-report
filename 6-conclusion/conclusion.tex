@@ -6,6 +6,17 @@
 
 % sample content
 \chapter{Conclusion}
-Conclude something please
-
+The scope of of this project was to investigate how Windows tracing and logging features could be used to detect exploitation of vulnerabilities given patch information. The result of this work is practical ways of detecting CVE-2021-24086 using either \gls{ETW} or function hooking.
+\\
+\\
+This thesis showcases that it is possible to construct a \gls{POC} of a recently patched vulnerability, given only publicly available information and a diff of the non-patched and patched binary. In this thesis we presented the work needed to reproduce and exploit CVE-2021-24086, which was a \gls{dos} vulnerability in the handling of fragmented IPv6 packets in Windows.
+\\
+\\
+While \gls{ETW} could not be used to detect CVE-2021-24086 on an unpatched system, we showcased the usefulness of this method on patched systems. While \gls{ETW} did showcase useful properties in detecting vulnerabilities in the TCP/IP driver, further work is needed to fully scope its usefulness in detecting exploitation attempts of vulnerabilities given a patch.
+\\
+\\
+Based on the analysis of CVE-2021-24086, we successfully created a \gls{POC} to simulate kernel function hooking. This simulation was used to successfully, and without false positives, detect an exploitation attempt of CVE-2021-24086, by intercepting the function call to \mintinline{c}{Ipv6pReassembleDatagram}. This demonstrated the power of using function hooking to detect exploitation attempts of vulnerabilities with available patches on systems where said patch was not yet applied.
+\\
+\\
+In this project we only explored detection of a single vulnerability, CVE-2021-24086. However, in the discussion we analyzed the fundamentals of scaling and automating the process done in this project in regards to what is needed to apply the same methodology for other vulnerabilities. While we showcased the practicality of detecting an exploitation attempt of CVE-2021-24086, further work is needed in regards to more vulnerability types. More work is needed in the acquirement of patch information, but also in using this information to determine the root cause and creating detection logic.
 \end{document}

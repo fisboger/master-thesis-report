@@ -37,7 +37,7 @@ If we disregard the fact that \gls{ETW} telemetry was not sufficient to detect C
 As function hooking and \gls{ETW} is so fundamentally different, it is hard to compare them in a proper way. Function hooking has a high level of customization which also brings a high level of complexity. \gls{ETW}, while still being somewhat complex, works out of the box, has a high level of robustness, but gives very little in terms of customization. Furthermore, \gls{ETW} could only be used to detect CVE-2021-24086 after the patch was applied, which is not that valuable in regards to the scope of this project. Given more vulnerabilities, we do believe that \gls{ETW} could show its worth, but it is impossible to say without further work analyzing more vulnerabilities. Perhaps a combination of function hooking and \gls{ETW} is optimal, as both can be run at the same time without large penalties, both in regards to performance, security and scalability.
 
 \section{Patch information}
-In \fullref{sec:CVE-2021-24086} we analyzed and reproduced a vulnerability using only publicly available information and information gained from the patch. While publicly available information was very scarce, extracting information from the patch gave us very valuable and usable information quickly revealing the root-cause of the vulnerability. While developing a full fledged \gls{POC} took a lot of time, revealing the root-cause of the vulnerability was very quick.
+In \fullref{sec:CVE-2021-24086} we analyzed and reproduced a vulnerability using only publicly available information and information gained from the patch. While publicly available information was very scarce, extracting information from the patch gave us very valuable and usable information quickly revealing the root cause of the vulnerability. While developing a full fledged \gls{POC} took a lot of time, revealing the root cause of the vulnerability was very quick.
 \\
 \\
 The goal of this project is mainly to discover the information given by a patch, and determine if this information can be used to detect the vulnerability in an unpatched system. Therefore, we must detail exactly what information can be extracted from a patch given the right tools such as BinDiff\cite{url:bindiff:homepage} and IDA Pro\cite{url:ida-pro:homepage}:
@@ -59,13 +59,13 @@ If we were to relate patch information to detection, it is important to highligh
 When patch information is analyzed by someone with the right skills within vulnerability research, it gives tremendous value both in detection purposes, but definitely also within exploitation purposes. The question remains however, whether the right information can be gathered programmatically and in a way that is easy to scale and automate. The next sections will explore this further.
 
 \section{Scalability and automation}
-The most important part of scaling and automating the detection of vulnerabilities given a patch is to extract the patch information and interpret it correctly. The following sections will first explore how information can be extracted without human interaction and hereafter how to detect the root-cause of a vulnerability and use that information to create detection logic to detect it.
+The most important part of scaling and automating the detection of vulnerabilities given a patch is to extract the patch information and interpret it correctly. The following sections will first explore how information can be extracted without human interaction and hereafter how to detect the root cause of a vulnerability and use that information to create detection logic to detect it.
 
 \subsection{Information gathering}
 Automating information gathering is a somewhat simple task. The binary comparison can be fully handled by a tool such as BinDiff\cite{url:bindiff:homepage}, whereafter the information can be extracted. BinDiff uses a undocumented binary format with the extension \mintinline{text}{.BinExport}, making the extraction of the information somewhat cumbersome. With that said however, the Ghidra\cite{url:ghidra:homepage} extension BinDiffHelper\cite{url:BinDiffHelper:homepage} has code to extract the necessary information from the binary format which we can most likely reuse without much effort.
 
-\subsection{Root-cause analysis}
-To be able to detect a vulnerability, knowing what caused it is a very important step. If we consider CVE-2021-24086, the root-cause was a null pointer dereference due to a length not being checked correctly. So while the root-cause is a null pointer dereference, the detection does not directly detect the null pointer dereference. The detection actually worked by looking for the symptom leading to a null pointer dereference. However, as the Windows kernel and privileged applications are mainly written in C and C++, many other vulnerability types are prevalent. An unexhaustive list of the most common vulnerability types can be seen here:
+\subsection{Root cause analysis}
+To be able to detect a vulnerability, knowing what caused it is a very important step. If we consider CVE-2021-24086, the root cause was a null pointer dereference due to a length not being checked correctly. So while the root cause is a null pointer dereference, the detection does not directly detect the null pointer dereference. The detection actually worked by looking for the symptom leading to a null pointer dereference. However, as the Windows kernel and privileged applications are mainly written in C and C++, many other vulnerability types are prevalent. An inexhaustive list of the most common vulnerability types can be seen here:
 
 \begin{enumerate}
     \item Null pointer dereference
@@ -82,7 +82,7 @@ To be able to detect a vulnerability, knowing what caused it is a very important
 As one can probably imagine, most of these vulnerability types are not fixed in the same way, and in some instances the same vulnerability type might be fixed in different ways as well.
 \\
 \\
-If we examine one vulnerability type, such as integer overflows, we can see the complexity of analyzing the root-cause. Imagine a scenario where a buffer is allocated with the size calculated as the sum two 16 bit unsigned integers. The length of this buffer is stored in a 16 bit register as an unsigned integer. In cases like these the integer can overflow such that the buffer size will be calculated as such:
+If we examine one vulnerability type, such as integer overflows, we can see the complexity of analyzing the root cause. Imagine a scenario where a buffer is allocated with the size calculated as the sum two 16 bit unsigned integers. The length of this buffer is stored in a 16 bit register as an unsigned integer. In cases like these the integer can overflow such that the buffer size will be calculated as such:
 \begin{align}
     \text{bufferSize} = uint16(&u_1 + u_2) = (u_1 + u_2) - 65535 \\
     \text{When }&u_1 + u_2 > 65535 \nonumber
@@ -91,8 +91,8 @@ If we examine one vulnerability type, such as integer overflows, we can see the 
 In instances like these, the flaw might be fixed in two different ways depending on what part of the logic is flawed. In cases where the buffer is never supposed to be bigger than 16 bits a bounds check must be added. This is usually reflected as a \mintinline{asm}{CMP} instruction in the assembly checking if the sum of the two 16 bit unsigned registers is larger than 0xFFFF. If the issue lies within the fact that the buffer has the wrong maximum size, the 16 it register could simply be swapped with a 32 bit register.
 \\
 \\
-As the example highlights, finding the actual root-cause of a vulnerability is not easily achieved. For just one vulnerability type, at least two obvious root-causes with fixes can be found. Another issue is also the fact that at the time of root-cause analysis, we do not know the vulnerability type. This makes it incrementally more difficult to define the root-cause, as you are restricted to only basing your analysis on the changes in the binary. Additionally, the same binary often contains more than one vulnerability, as seen in the patch tuesday of July 2021\cite{url:patch-tuesday:2021:july} which patched nine vulnerabilities in Windows DNS Server.
-% The point we are trying to get across here, is that automatic root-cause analysis is very complicated to get 100\% right. 
+As the example highlights, finding the actual root cause of a vulnerability is not easily achieved. For just one vulnerability type, at least two obvious root causes with fixes can be found. Another issue is also the fact that at the time of root cause analysis, we do not know the vulnerability type. This makes it incrementally more difficult to define the root cause, as you are restricted to only basing your analysis on the changes in the binary. Additionally, the same binary often contains more than one vulnerability, as seen in the patch tuesday of July 2021\cite{url:patch-tuesday:2021:july} which patched nine vulnerabilities in Windows DNS Server.
+% The point we are trying to get across here, is that automatic root cause analysis is very complicated to get 100\% right. 
 
 % This is the difficult part
 % Mention many vulnerability types
@@ -104,7 +104,7 @@ As the example highlights, finding the actual root-cause of a vulnerability is n
 
 
 \subsection{Detection logic}
-The next step in detecting exploitation of vulnerabilities at scale is to create detection logic that will trigger on exploitation attempts as we did with CVE-2021-24086. If we assume that we are able to automate the process of obtaining patch information and analyzing it to correctly determine the root-cause, there is still a lot of unanswered questions in regard to creating the detection itself. Again, depending on the type of vulnerability, the detection needs to be created differently.
+The next step in detecting exploitation of vulnerabilities at scale is to create detection logic that will trigger on exploitation attempts as we did with CVE-2021-24086. If we assume that we are able to automate the process of obtaining patch information and analyzing it to correctly determine the root cause, there is still a lot of unanswered questions in regard to creating the detection itself. Again, depending on the type of vulnerability, the detection needs to be created differently.
 \\
 \\
 If we base this analysis on the integer overflow example as explained above, the detection can be somewhat automated. If we take the example where the patch contains a \mintinline{asm}{CMP} instruction to ensure the size is no larger than a specific value (such as 16 bits, $2^{16}-1$), we can simply have the same logic in our detection. In the other example with integer overflow, where the fix was to switch the register, a similar detection logic could be employed to detect when the overflow happens.
@@ -123,13 +123,10 @@ The first option where we track the usage of specific registers we know are invo
 The second options where we hook the function at the specific location also has certain constraints and issues. First of all, when hooking a function at the beginning, we only have to save the registers and stack involved in the calling convention as explained in \fullref{tab:asm:calling-convention}. When doing the same in the middle of a function, we do not have the same luxury. In the instances we have to not only save and restore all registers, we also have to save an restore the stack. If we fail to do so we will alter the execution of the source function once it is resumed. Secondly, the margin of error is very low, meaning that if any register, stack value or memory value is changed and not restored, there is a high chance of either crashing the source application, altering the execution or worse.
 \\
 \\
-If we take a closer look at detection using \gls{ETW}, we have different issues to resolve. While we could not use \gls{ETW} to detect CVE-2021-24086, we simply do not have enough data to completely disregard it completely. If we assume that we can use \gls{ETW} to detect vulnerabilities, the biggest hurdle is analyzing what events to use. As we discovered in \fullref{sec:detection:etw} most events are triggered when a known unintended state happens. In an ideal world we would have a \gls{POC} where we could then dynamically trace the events generated, but in our case we do not have a \gls{POC}. One thing that could be done was to look for events in the function where the vulnerability is triggered, but it is very difficult to determine the effectiveness if we are unable to test it using a \gls{POC}.
+If we take a closer look at detection using \gls{ETW}, we have different issues to resolve. While we could not use \gls{ETW} to detect CVE-2021-24086, we simply do not have enough data to completely disregard it completely. If we assume that we can use \gls{ETW} to detect exploitation of vulnerabilities, the biggest hurdle is analyzing what events to use. As we discovered in \fullref{sec:detection:etw} most events are triggered when a known unintended state happens. In an ideal world we would have a \gls{POC} where we could then dynamically trace the events generated, but in our case we do not have a \gls{POC}. One thing that could be done was to look for events in the function where the vulnerability is triggered, but it is very difficult to determine the effectiveness if we are unable to test it using a \gls{POC}.
 \\
 \\
 As we have discussed in this section, detecting vulnerabilities based purely on patch information is very difficult at scale. While we are able to use techniques such as \gls{ETW} and function hooking to manually create detection for a vulnerability, more work is needed in order to scale and automate such a process.
-
-\section{Future work}
-\todo{Do this}
 % Analyze more vulnerabilities
 % Analyze ETW on a broader scale
 % Try to develop a proper PoC for one class of vulnerabilities
