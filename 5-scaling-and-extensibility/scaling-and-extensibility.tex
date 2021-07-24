@@ -76,6 +76,7 @@ To be able to detect a vulnerability, knowing what caused it is a very important
     \item Arbitrary memory overwrite
     \item Integer overflow
     \item Logic bugs
+    \item Race condition
 \end{enumerate}
 
 As one can probably imagine, most of these vulnerability types are not fixed in the same way, and in some instances the same vulnerability type might be fixed in different ways as well.
@@ -87,7 +88,7 @@ If we examine one vulnerability type, such as integer overflows, we can see the 
     \text{When }&u_1 + u_2 > 65535 \nonumber
 \end{align}
 
-In instances like these, the flaw might be fixed in two different ways depending on what part of the logic is flawed. In cases where the buffer is never supposed to be bigger than 16 bits a bounds check must be added. This is usually reflected as a \mintinline{asm}{cmp} instruction in the assembly checking if the sum of the two 16 bit unsigned registers is larger than 0xFFFF. If the issue lies within the fact that the buffer has the wrong maximum size, the 16 it register could simply be swapped with a 32 bit register.
+In instances like these, the flaw might be fixed in two different ways depending on what part of the logic is flawed. In cases where the buffer is never supposed to be bigger than 16 bits a bounds check must be added. This is usually reflected as a \mintinline{asm}{CMP} instruction in the assembly checking if the sum of the two 16 bit unsigned registers is larger than 0xFFFF. If the issue lies within the fact that the buffer has the wrong maximum size, the 16 it register could simply be swapped with a 32 bit register.
 \\
 \\
 As the example highlights, finding the actual root-cause of a vulnerability is not easily achieved. For just one vulnerability type, at least two obvious root-causes with fixes can be found. Another issue is also the fact that at the time of root-cause analysis, we do not know the vulnerability type. This makes it incrementally more difficult to define the root-cause, as you are restricted to only basing your analysis on the changes in the binary. Additionally, the same binary often contains more than one vulnerability, as seen in the patch tuesday of July 2021\cite{url:patch-tuesday:2021:july} which patched nine vulnerabilities in Windows DNS Server.
@@ -103,14 +104,32 @@ As the example highlights, finding the actual root-cause of a vulnerability is n
 
 
 \subsection{Detection logic}
-% Creating logic is also difficult
-% If we see a compare added we can do the same
-% However, how do we know where in memory the value is?
-% What if the value is not present in memory at function start as with CVE-2021-24086?
-% Hook somewhere else?
-% Find nearby ETW telemetry -> Very difficult
+The next step in detecting exploitation of vulnerabilities at scale is to create detection logic that will trigger on exploitation attempts as we did with CVE-2021-24086. If we assume that we are able to automate the process of obtaining patch information and analyzing it to correctly determine the root-cause, there is still a lot of unanswered questions in regard to creating the detection itself. Again, depending on the type of vulnerability, the detection needs to be created differently.
+\\
+\\
+If we base this analysis on the integer overflow example as explained above, the detection can be somewhat automated. If we take the example where the patch contains a \mintinline{asm}{CMP} instruction to ensure the size is no larger than a specific value (such as 16 bits, $2^{16}-1$), we can simply have the same logic in our detection. In the other example with integer overflow, where the fix was to switch the register, a similar detection logic could be employed to detect when the overflow happens.
+\\
+\\
+One unanswered question however, is how do we ensure that we check on the right value. As we have explored earlier, function hooking redirects the execution at the beginning of the function. However, some cases exists where the register values we base our detection on is not present in the beginning of the function. In these cases we have two options:
+
+\begin{enumerate}
+    \item Trace the usage and calculation of relevant registers
+    \item Hook the function at the fix location
+\end{enumerate}
+
+The first option where we track the usage of specific registers we know are involved in the calculation of the value we detect on can be a very cumbersome action. In CVE-2021-24086 we were able to calculate the value directly from memory, but in some cases we must also execute other functions and do advanced calculations, that might ruin the source function's execution flow. With the constraints explained here, it will only work for a subset of cases, such as it did with CVE-2021-24086.
+\\
+\\
+The second options where we hook the function at the specific location also has certain constraints and issues. First of all, when hooking a function at the beginning, we only have to save the registers and stack involved in the calling convention as explained in \fullref{tab:asm:calling-convention}. When doing the same in the middle of a function, we do not have the same luxury. In the instances we have to not only save and restore all registers, we also have to save an restore the stack. If we fail to do so we will alter the execution of the source function once it is resumed. Secondly, the margin of error is very low, meaning that if any register, stack value or memory value is changed and not restored, there is a high chance of either crashing the source application, altering the execution or worse.
+\\
+\\
+If we take a closer look at detection using \gls{ETW}, we have different issues to resolve. While we could not use \gls{ETW} to detect CVE-2021-24086, we simply do not have enough data to completely disregard it completely. If we assume that we can use \gls{ETW} to detect vulnerabilities, the biggest hurdle is analyzing what events to use. As we discovered in \fullref{sec:detection:etw} most events are triggered when a known unintended state happens. In an ideal world we would have a \gls{POC} where we could then dynamically trace the events generated, but in our case we do not have a \gls{POC}. One thing that could be done was to look for events in the function where the vulnerability is triggered, but it is very difficult to determine the effectiveness if we are unable to test it using a \gls{POC}.
+\\
+\\
+As we have discussed in this section, detecting vulnerabilities based purely on patch information is very difficult at scale. While we are able to use techniques such as \gls{ETW} and function hooking to manually create detection for a vulnerability, more work is needed in order to scale and automate such a process.
 
 \section{Future work}
+\todo{Do this}
 % Analyze more vulnerabilities
 % Analyze ETW on a broader scale
 % Try to develop a proper PoC for one class of vulnerabilities

@@ -13,7 +13,6 @@ As mentioned in \fullref{cha:introduction}, the goal of this project is to resea
 One \gls{ETW} provider that is widely used to detect malicious activity such as exploitation of vulnerabilities is the \mintinline{c}{Microsoft_windows-Threat-Intelligence}\cite{url:etw:etwti} provider. This is widely used by various \gls{av} engines such as Microsoft's own \gls{edr}/\gls{av} tool, Microsoft Defender for Endpoint. While this provider gives insight into Windows \gls{api} calls often used in an exploitation process, we will not be focusing on this. As mentioned in \fullref{cha:introduction} and discussed in \fullref{sec:CVE-2021-24086}, the project will revolve around detection of CVE-2020-24086, which is a vulnerability in the \mintinline{c}{tcpip.sys} driver of Windows. Due to this, we will in this section explore \gls{ETW} providers relevant to this specific driver.
 
 \subsubsection{Finding providers}
-\todo{Read this section thorougly as it has been revised a lot ad-hoc}
 Getting a list of all available providers in Windows is fairly simply. A few methods exists, such as:
 
 \begin{enumerate}

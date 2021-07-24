@@ -45,8 +45,6 @@ Examining the surrounding code further, we can see that the event is sent if the
 \\
 Having examined all the events present in any of the related functions from the stacktrace we can with confidence say that it is not possible to detect CVE-2021-24068 using close proximity \gls{ETW} events.
 
-\todo{Maybe add paragraph about why looking at other ETW events is the same as network analysis which is probably easier}
-
 \subsection{Post-patch \glsentrytext{ETW} event hunting}
 In the previous section we highlighted the usage of \gls{ETW} events used to report when the execution enters into unintended states, and how this cannot be used for detecting unknown vulnerabilities. A change that we did not highlight during the analysis of CVE-2021-24086 in \fullref{sec:CVE-2021-24086}, was the fact that a new call to \mintinline{c}{EtwWriteTransfer} was added in the patched version of \mintinline{c}{tcpip.sys}. The call can be seen in listing \ref{listing:detection:etw:post-patch-event} and is written when the size of the packet is above 0xFFFF bytes, and it can therefore be used to detect exploitation attempts of CVE-2021-24086.
 
